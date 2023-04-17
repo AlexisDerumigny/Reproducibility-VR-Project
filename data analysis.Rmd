@@ -1,0 +1,146 @@
+---
+title: "Analysis"
+date: "2023-04-17"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+# 1- Data loading and preprocessing
+
+```{r data loading}
+con <- file("data2023-04-17.csv", "r", blocking = FALSE)
+
+data = readLines(con)
+close.connection(con)
+
+df = strsplit(data, split=";")
+
+n_row = length(data)
+n_col = 64
+
+my_df = matrix(nrow = n_row - 1, ncol = n_col)
+for (i in 1:(n_row-1)){
+  for (j in 1:n_col){
+    my_df[i,j] = df[[i+1]][j]
+  }
+} 
+my_df = as.data.frame.matrix(my_df)
+colnames(my_df) <- df[[1]]
+
+colnames(my_df)[2] = "ParticipantID"
+colnames(my_df)[3] = "Condition"
+```
+
+
+```{r loading data questions}
+data_questions = read.csv("data_questions2023-04-17.csv",
+                          sep = ";")
+
+for (i_question in 1:61){
+  if (data_questions$ToBeInverted[i_question] == -1){
+    my_df[, i_question + 3] = 6 - as.numeric(my_df[, i_question + 3])
+  } else if (data_questions$ToBeInverted[i_question] == -2){
+    my_df[, i_question + 3] = 5 - as.numeric(my_df[, i_question + 3]) * 4/3
+  } else {
+    my_df[, i_question + 3] = as.numeric(my_df[, i_question + 3])
+  }
+} 
+```
+
+
+```{r pivoting data frame}
+# Put in tidy format: one value per line
+# (repeat questions for each participant and each condition)
+
+my_df_pivot = pivot_longer(
+  data = my_df, cols = !all_of(c("Timestamp", "ParticipantID" , 
+                                 "Condition")),
+  names_to = "QuestionName"
+)
+
+my_df_pivot$QuestionGroup = NA
+
+for (i_question in 1:61){
+  question = data_questions$Question_description[i_question]
+  group = data_questions$QuestionGroup[i_question]
+  my_df_pivot$QuestionGroup[
+    which(my_df_pivot$QuestionName == question) ] = group
+}
+
+# Selecting only ``valid questions''
+valid_questions = data_questions$Question_description[which(data_questions$ToBeInverted != 0)]
+my_df_pivot = my_df_pivot[which(my_df_pivot$QuestionName %in% valid_questions), ]
+```
+
+# 2- Visualization
+
+```{r}
+boxplot(value ~ QuestionName, data = my_df_pivot)
+
+boxplot(value ~ QuestionGroup, data = my_df_pivot)
+```
+
+
+```{r fig.height = 8, fig.width=10}
+# Filled box for each combination Condition/QuestionName
+
+my_df_pivot %>%
+  group_by(Condition, QuestionName) %>%
+  summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
+  ungroup() %>%
+  ggplot() +
+  geom_tile(aes(x = Condition, y = QuestionName,
+                fill = averageValue))
+
+# Filled box for each combination Condition/QuestionGroup
+
+my_df_pivot %>%
+  group_by(Condition, QuestionGroup) %>%
+  summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
+  ungroup() %>%
+  ggplot() +
+  geom_tile(aes(x = Condition, y = QuestionGroup,
+                fill = averageValue))
+```
+
+
+# 3- Modeling
+
+
+## 3.1 All data
+
+
+```{r}
+my_model = lme4::lmer(
+  data = my_df_pivot,
+  value ~ Condition * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName)
+)
+
+summary(my_model)
+```
+
+## 3.2 General effect of condition
+
+```{r}
+my_model_emmeans_condition = emmeans::emmeans(my_model, list(pairwise ~ Condition), adjust = "bonferroni")
+print(my_model_emmeans_condition)
+```
+
+
+## 3.3 Differences in condition by QuestionGroup
+
+```{r}
+my_model_emmeans = emmeans::emmeans(my_model, ~ Condition | QuestionGroup)
+pairs(my_model_emmeans, simple = "Condition", adjust = "bonferroni")
+```
+
+
