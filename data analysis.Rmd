@@ -17,7 +17,7 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 # 1- Data loading and preprocessing
 
 ```{r data loading}
-con <- file("data2023-04-17.csv", "r", blocking = FALSE)
+con <- file("UXdata2023-04-28.csv", "r", blocking = FALSE)
 
 data = readLines(con)
 close.connection(con)
@@ -34,6 +34,8 @@ for (i in 1:(n_row-1)){
   }
 } 
 my_df = as.data.frame.matrix(my_df)
+
+
 colnames(my_df) <- df[[1]]
 
 colnames(my_df)[2] = "ParticipantID"
@@ -42,7 +44,7 @@ colnames(my_df)[3] = "Condition"
 
 
 ```{r loading data questions}
-data_questions = read.csv("data_questions2023-04-17.csv",
+data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same at 2023-04-28
                           sep = ";")
 
 for (i_question in 1:61){
