@@ -7,8 +7,9 @@ output:
     toc_depth: 2
 ---
 
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
 
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
@@ -114,8 +115,7 @@ my_df_pivot %>%
   summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
   ungroup() %>%
   ggplot() +
-  geom_tile(aes(x = Condition, y = QuestionGroup,
-                fill = averageValue, label = averageValue)) +
+  geom_tile(aes(x = Condition, y = QuestionGroup, fill = averageValue)) +
   geom_text(aes(x = Condition, y = QuestionGroup, label = round(averageValue, digits = 1))) +
   guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
   xlab("Direction condition") + ylab("Question Group")
