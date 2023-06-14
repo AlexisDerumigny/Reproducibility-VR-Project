@@ -1,0 +1,108 @@
+---
+title: "DirectionData"
+output: html_document
+date: "2023-06-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+
+```{r}
+directionaldata = read.csv(file = here::here("DirectionalAnalysis/direction_analysis2023-6-14-14-26.csv"))
+```
+
+```{r}
+unique(directionaldata$LocomotionTechnique)
+unique(directionaldata$SubjectNr)
+```
+
+
+```{r}
+plot1 <- ggplot(directionaldata) +
+  geom_line(aes(y = StandingAngle, x = SecSinceStart, color = LocomotionTechnique)) +
+  facet_grid(vars(SubjectNr), vars(LocomotionTechnique))
+
+png("StandingAngles.png", width = 20000, height = 20000, units = "px")
+print(plot1)
+dev.off()
+
+# ggsave("StandingAngles.png", plot = plot1, width = 2000, height = 2000, units = "px")
+```
+
+```{r}
+plot2 <- directionaldata %>%
+  filter(LocomotionTechnique == "StandingFootVelocity",
+         SubjectNr == 14) %>%
+  pivot_longer(cols = contains("Angle"),
+               names_to = "TypeAngle",
+               values_to = "Angle") %>%
+  ggplot() +
+  geom_line(aes(y = Angle, x = SecSinceStart, color = TypeAngle))
+
+plot2
+```
+
+```{r}
+makeRegularAngle =  function(x){
+  y = if_else(x <= -360, x + 360, x)
+  y = if_else(y <= -180, y + 360, y)
+  y = if_else(y > 360, y - 360, y)
+  y = if_else(y > 180, y - 360, y)
+  return (y)
+}
+
+data_diff = directionaldata %>%
+  mutate(
+    diff_Standing_Hip = makeRegularAngle(StandingAngle - HipAngle), 
+    diff_Standing_Head = makeRegularAngle(StandingAngle - HeadAngle), 
+    diff_Standing_AvgFeet = makeRegularAngle(StandingAngle - AvgFeetAngle), 
+    diff_Hip_Head = makeRegularAngle(HipAngle - HeadAngle), 
+    diff_Hip_AvgFeet = makeRegularAngle(HipAngle - AvgFeetAngle), 
+    diff_Head_AvgFeet = makeRegularAngle(HeadAngle - AvgFeetAngle)
+    ) %>%
+  pivot_longer(cols = contains("diff"),
+               names_to = "Type_diff",
+               values_to = "value_diff") %>%
+  group_by(LocomotionTechnique, SubjectNr, Type_diff) %>%
+  summarise(
+    mean_abs_diff = mean(abs(value_diff))
+  ) %>%
+  ungroup()
+```
+
+
+```{r}
+data_diff_avg = data_diff %>%
+  filter(LocomotionTechnique != "TrainingNoVR") %>%
+  group_by(Type_diff) %>%
+  summarise(mean_abs_diff_agrgLocomotionTechnique = mean(mean_abs_diff)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = Type_diff, values_from = mean_abs_diff_agrgLocomotionTechnique)
+```
+
+
+```{r}
+matrixDist = matrix(0, nrow = 4, ncol = 4)
+colnames(matrixDist) <- c("Standing", "Head", "Hip", "AvgFeet")
+rownames(matrixDist) <- c("Standing", "Head", "Hip", "AvgFeet")
+
+matrixDist[1,2] = as.numeric(data_diff_avg[1, "diff_Standing_Head"])
+matrixDist[1,3] = as.numeric(data_diff_avg[1, "diff_Standing_Hip"])
+matrixDist[1,4] = as.numeric(data_diff_avg[1, "diff_Standing_AvgFeet"])
+matrixDist[2,3] = as.numeric(data_diff_avg[1, "diff_Hip_Head"])
+matrixDist[2,4] = as.numeric(data_diff_avg[1, "diff_Head_AvgFeet"])
+matrixDist[3,4] = as.numeric(data_diff_avg[1, "diff_Hip_AvgFeet"])
+matrixDist = matrixDist + t(matrixDist)
+
+matrixDist
+```
+
+```{r}
+plot(hclust(dist(matrixDist)))
+```
+
+
