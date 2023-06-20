@@ -7,8 +7,9 @@ output:
     toc_depth: 2
 ---
 
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
 
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
@@ -17,7 +18,7 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 # 1- Data loading and preprocessing
 
 ```{r data loading}
-con <- file("data2023-04-17.csv", "r", blocking = FALSE)
+con <- file("UXdata2023-04-28.csv", "r", blocking = FALSE)
 
 data = readLines(con)
 close.connection(con)
@@ -34,15 +35,26 @@ for (i in 1:(n_row-1)){
   }
 } 
 my_df = as.data.frame.matrix(my_df)
+
+
 colnames(my_df) <- df[[1]]
 
 colnames(my_df)[2] = "ParticipantID"
 colnames(my_df)[3] = "Condition"
+
+my_df <- my_df %>%
+  mutate(Condition =
+           factor(recode(Condition,
+                         HED = 'Head Oriented', HIP = 'Hip Oriented',
+                         STF = 'Standing Foot Velocity', AVG =  'Avg Feet Oriented' ),
+                  levels = c("Head Oriented", "Hip Oriented",
+                             "Standing Foot Velocity", "Avg Feet Oriented")
+           ) )
 ```
 
 
 ```{r loading data questions}
-data_questions = read.csv("data_questions2023-04-17.csv",
+data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same at 2023-04-28
                           sep = ";")
 
 for (i_question in 1:61){
@@ -79,6 +91,14 @@ for (i_question in 1:61){
 # Selecting only ``valid questions''
 valid_questions = data_questions$Question_description[which(data_questions$ToBeInverted != 0)]
 my_df_pivot = my_df_pivot[which(my_df_pivot$QuestionName %in% valid_questions), ]
+
+# Scaling the values to be between 0 and 100.
+my_df_pivot$value = (my_df_pivot$value - 1) * 100 / 4
+
+# Renaming SSQ
+my_df_pivot$QuestionGroup = if_else(condition = my_df_pivot$QuestionGroup == "SSQ",
+                                    true = "VR Sickness",
+                                    false = my_df_pivot$QuestionGroup)
 ```
 
 # 2- Visualization
@@ -108,8 +128,13 @@ my_df_pivot %>%
   summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
   ungroup() %>%
   ggplot() +
-  geom_tile(aes(x = Condition, y = QuestionGroup,
-                fill = averageValue))
+  geom_tile(aes(x = Condition, y = QuestionGroup, fill = averageValue)) +
+  geom_text(aes(x = Condition, y = QuestionGroup, label = round(averageValue, digits = 1))) +
+  guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
+  xlab("Direction condition") + ylab("Question Group") +
+  scale_fill_gradient2(
+    limits = c(0,100), breaks = seq(0, 100, by = 10), 
+    midpoint = 90, low = "#132B43", mid = "#56B1F7", high = "white")
 ```
 
 
