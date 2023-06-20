@@ -89,6 +89,11 @@ my_df_pivot = my_df_pivot[which(my_df_pivot$QuestionName %in% valid_questions), 
 
 # Scaling the values to be between 0 and 100.
 my_df_pivot$value = (my_df_pivot$value - 1) * 100 / 4
+
+# Renaming SSQ
+my_df_pivot$QuestionGroup = if_else(condition = my_df_pivot$QuestionGroup == "SSQ",
+                                    true = "VR Sickness",
+                                    false = my_df_pivot$QuestionGroup)
 ```
 
 # 2- Visualization
