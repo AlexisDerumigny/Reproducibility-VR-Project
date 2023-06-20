@@ -131,7 +131,10 @@ my_df_pivot %>%
   geom_tile(aes(x = Condition, y = QuestionGroup, fill = averageValue)) +
   geom_text(aes(x = Condition, y = QuestionGroup, label = round(averageValue, digits = 1))) +
   guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
-  xlab("Direction condition") + ylab("Question Group")
+  xlab("Direction condition") + ylab("Question Group") +
+  scale_fill_gradient2(
+    limits = c(0,100), breaks = seq(0, 100, by = 10), 
+    midpoint = 90, low = "#132B43", mid = "#56B1F7", high = "white")
 ```
 
 
