@@ -42,9 +42,14 @@ colnames(my_df) <- df[[1]]
 colnames(my_df)[2] = "ParticipantID"
 colnames(my_df)[3] = "Condition"
 
-library(dplyr)
 my_df <- my_df %>%
-    mutate(Condition = recode(Condition, HED = 'Head Oriented', HIP = 'Hip Oriented', STF = 'Standing Foot Velocity', AVG =  'Avg Feet Oriented' ))
+  mutate(Condition =
+           factor(recode(Condition,
+                         HED = 'Head Oriented', HIP = 'Hip Oriented',
+                         STF = 'Standing Foot Velocity', AVG =  'Avg Feet Oriented' ),
+                  levels = c("Head Oriented", "Hip Oriented",
+                             "Standing Foot Velocity", "Avg Feet Oriented")
+           ) )
 ```
 
 
