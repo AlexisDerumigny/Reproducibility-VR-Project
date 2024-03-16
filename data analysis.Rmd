@@ -7,7 +7,8 @@ output:
     toc_depth: 2
 ---
 
-
+# In Rstudio go to Tools > Install packages 
+# Into the bar type: knitr,tidyverse,lme4,emmeans
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
@@ -54,16 +55,18 @@ my_df <- my_df %>%
 
 
 ```{r loading data questions}
-data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same at 2023-04-28
+data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same also for the dataset at 2023-04-28, so does not have to be changed 
                           sep = ";")
 
+# here questions are inverted if 1 is best, and 5 is worst.
+# additionally there are some questions on speed and direction, where 3 is best, and 1 and 5 are worst. (speed/direction too fast/slow) These are corrected here.
 for (i_question in 1:61){
   if (data_questions$ToBeInverted[i_question] == -1){
-    my_df[, i_question + 3] = 6 - as.numeric(my_df[, i_question + 3])
-  } else if (data_questions$ToBeInverted[i_question] == -2){
-    my_df[, i_question + 3] = 5 - as.numeric(my_df[, i_question + 3]) * 4/3
+    my_df[, i_question + 3] = 6 - as.numeric(my_df[, i_question + 3])        #invert if 1 is best and 5 is worst, to 1 is worst and 5 is best
+  } else if (data_questions$ToBeInverted[i_question] == -2){                 
+    my_df[, i_question + 3] = 5 - as.numeric(my_df[, i_question + 3]) * 4/3  # this scaling is for the VR sickness questions since those are Likert scale 0 to 3, and should now be mapped from 1 to 5 to normalize
   } else {
-    my_df[, i_question + 3] = as.numeric(my_df[, i_question + 3])
+    my_df[, i_question + 3] = as.numeric(my_df[, i_question + 3])            # else, keep default scaling.
   }
 } 
 ```
@@ -89,13 +92,14 @@ for (i_question in 1:61){
 }
 
 # Selecting only ``valid questions''
-valid_questions = data_questions$Question_description[which(data_questions$ToBeInverted != 0)]
+# the two questions on speed questions with 3 being best, 5 and 1 being worst are labeled 0 and counted as "invalid"
+valid_questions = data_questions$Question_description[which(data_questions$ToBeInverted != 0)] 
 my_df_pivot = my_df_pivot[which(my_df_pivot$QuestionName %in% valid_questions), ]
 
 # Scaling the values to be between 0 and 100.
 my_df_pivot$value = (my_df_pivot$value - 1) * 100 / 4
 
-# Renaming SSQ
+# Renaming SSQ to VR Sickness
 my_df_pivot$QuestionGroup = if_else(condition = my_df_pivot$QuestionGroup == "SSQ",
                                     true = "VR Sickness",
                                     false = my_df_pivot$QuestionGroup)
@@ -134,7 +138,7 @@ my_df_pivot %>%
   xlab("Direction condition") + ylab("Question Group") +
   scale_fill_gradient2(
     limits = c(0,100), breaks = seq(0, 100, by = 10), 
-    midpoint = 90, low = "#132B43", mid = "#56B1F7", high = "white")
+    midpoint = 50, low = "#141414", mid = "#193554", high = "#2dc6fc")
 ```
 
 
