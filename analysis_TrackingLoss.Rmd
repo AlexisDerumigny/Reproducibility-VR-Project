@@ -1,6 +1,6 @@
 ---
 title: "Analysis of tracking losses"
-date: "2023-04-17"
+date: "2023-04-19"
 output:
   html_document:
     toc: true
@@ -13,10 +13,50 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
+library(lme4)
 
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
 ```
 
 
 # 1- Data loading and preprocessing
+
+
+```{r}
+source("preparingTrackingLossData.R")
+```
+
+
+# 2- Visualization
+
+```{r}
+ggplot(dataTrackingLoss) +
+  geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5)
+```
+
+```{r}
+ggplot(dataTrackingLoss) +
+  geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5) +
+  facet_wrap(~ ParticipantID)
+```
+
+```{r}
+ggplot(dataTrackingLoss) +
+  geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5) +
+  facet_wrap(~ LocomotionTechnique)
+```
+
+# 3- Analysis
+
+```{r}
+reg1 <- lmer(data = dataTrackingLoss,
+             NrTrackerlosses ~ LocomotionTechnique + (1 | ParticipantID))
+
+summary(reg1)
+```
+
+```{r}
+my_model_emmeans = emmeans::emmeans(reg1, ~ LocomotionTechnique)
+pairs(my_model_emmeans, adjust = "none")
+```
 
