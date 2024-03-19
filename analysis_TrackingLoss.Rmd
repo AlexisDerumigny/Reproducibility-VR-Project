@@ -1,0 +1,22 @@
+---
+title: "Analysis of tracking losses"
+date: "2023-04-17"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# To install the necessary packages,
+# run install.packages(c("knitr","tidyverse","lme4","emmeans"))
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
+library(tidyverse)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+
+# 1- Data loading and preprocessing
+
