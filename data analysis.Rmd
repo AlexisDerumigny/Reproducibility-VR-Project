@@ -18,58 +18,10 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 
 # 1- Data loading and preprocessing
 
-```{r data loading}
-con <- file("UXdata2023-04-28.csv", "r", blocking = FALSE)
-
-data = readLines(con)
-close.connection(con)
-
-df = strsplit(data, split=";")
-
-n_row = length(data)
-n_col = 64
-
-my_df = matrix(nrow = n_row - 1, ncol = n_col)
-for (i in 1:(n_row-1)){
-  for (j in 1:n_col){
-    my_df[i,j] = df[[i+1]][j]
-  }
-} 
-my_df = as.data.frame.matrix(my_df)
-
-
-colnames(my_df) <- df[[1]]
-
-colnames(my_df)[2] = "ParticipantID"
-colnames(my_df)[3] = "Condition"
-
-my_df <- my_df %>%
-  mutate(Condition =
-           factor(recode(Condition,
-                         HED = 'Head Oriented', HIP = 'Hip Oriented',
-                         STF = 'Standing Foot Velocity', AVG =  'Avg Feet Oriented' ),
-                  levels = c("Head Oriented", "Hip Oriented",
-                             "Standing Foot Velocity", "Avg Feet Oriented")
-           ) )
+```{r}
+source("preparingUXdata.R")
 ```
 
-
-```{r loading data questions}
-data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same also for the dataset at 2023-04-28, so does not have to be changed 
-                          sep = ";")
-
-# here questions are inverted if 1 is best, and 5 is worst.
-# additionally there are some questions on speed and direction, where 3 is best, and 1 and 5 are worst. (speed/direction too fast/slow) These are corrected here.
-for (i_question in 1:61){
-  if (data_questions$ToBeInverted[i_question] == -1){
-    my_df[, i_question + 3] = 6 - as.numeric(my_df[, i_question + 3])        #invert if 1 is best and 5 is worst, to 1 is worst and 5 is best
-  } else if (data_questions$ToBeInverted[i_question] == -2){                 
-    my_df[, i_question + 3] = 5 - as.numeric(my_df[, i_question + 3]) * 4/3  # this scaling is for the VR sickness questions since those are Likert scale 0 to 3, and should now be mapped from 1 to 5 to normalize
-  } else {
-    my_df[, i_question + 3] = as.numeric(my_df[, i_question + 3])            # else, keep default scaling.
-  }
-} 
-```
 
 
 ```{r pivoting data frame}
