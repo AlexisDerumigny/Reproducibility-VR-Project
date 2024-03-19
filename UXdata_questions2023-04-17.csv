@@ -7,7 +7,7 @@ SSQ;Difficulty focusing;-2
 SSQ;Salivation increasing;-2
 SSQ;Sweating;-2
 SSQ;Nausea;-2
-SSQ;Difficutly concentrating;-2
+SSQ;Difficulty concentrating;-2
 SSQ;Fullness of the Head;-2
 SSQ;Blurred vision;-2
 SSQ;Dizziness with eyes open;-2
@@ -27,7 +27,7 @@ Perceived Errors;It was not possible to make silly mistakes;1
 Perceived Errors;The interface was very robust and reliable;1
 Perceived Errors;I kept making mistakes while interacting with the virtual environment;-1
 Perceived Errors;I was unaware of making mistakes;-1
-Appropriateness;The level of functionality (control) provided by the interface was appropriate for the task;1
+Appropriateness;The level of functionality control provided by the interface was appropriate for the task;1
 Appropriateness;The functionality provided by the interface was ambiguous;-1
 Appropriateness;I would have preferred an alternative interface to carry out the task;-1
 Appropriateness;The interface was ideal for interacting with a virtual environment;1
@@ -38,19 +38,19 @@ Input Responsiveness;The response to user input was acceptable;1
 Input Responsiveness;The response time did not affect my performance;1
 Naturalness;Rate how natural you found the experience of walking and interacting in the virtual environment;1
 Physical Strain Similarity;Rate how different the physical strain was compared to normal walking;-1
-Mental Effort;How mentally demanding was the task considering the interface used to perform it?;-1
-Perceived Physical Effort;How physically demanding was the task considering the interface used to perform it?;-1
+Mental Effort;How mentally demanding was the task considering the interface used to perform it;-1
+Perceived Physical Effort;How physically demanding was the task considering the interface used to perform it;-1
 Satisfaction;The interface used to perform the specific task was satisfying;1
 Satisfaction;The interface behaved in a manner that I expected;1
-Self-motion compellingness;Rate whether you indeed felt as if you were moving while walking in the virtual environment, overall;1
+Self-motion compellingness;Rate whether you indeed felt as if you were moving while walking in the virtual environment overall;1
 Acclimatisation;Rate how quickly you forgot that you were not really walking;1
-Presence;I got a sense of presence;1
+Presence;I got a sense of presence ie. of being there during the experience;1
 Presence;The behavior of the interface reduced my sense of presence;-1
 Presence;I had a good sense of scales while moving and interacting with the virtual environment;1
 Presence;I often did not know where I was in the virtual environment;-1
 Overall System Usability;I thought that the interface worked against me;-1
 Overall System Usability;The overall response time did not affect my performance;1
-Overall System Usability;I can see a real benefit in this style of man-machine interface;1
+Overall System Usability;I can see a real benefit in this style of manmachine interface;1
 Enjoyability;I enjoyed carrying out the tasks;1
 Control;I felt in control of the interface;1
 Learnability;I found it difficult to learn how to use the interface;-1
