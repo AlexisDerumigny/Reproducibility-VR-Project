@@ -25,69 +25,70 @@ source("preparingUXdata.R")
 
 
 ```{r pivoting data frame}
-# Put in tidy format: one value per line
-# (repeat questions for each participant and each condition)
 
-my_df_pivot = pivot_longer(
-  data = my_df, cols = !all_of(c("Timestamp", "ParticipantID" , 
-                                 "Condition")),
+# Put in tidy format: one value per line
+# (repeat questions for each participant and each LocomotionTechnique)
+
+dataUX_pivot = pivot_longer(
+  data = dataUX, cols = !all_of(c("Timestamp", "ParticipantID" , 
+                                 "LocomotionTechnique")),
   names_to = "QuestionName"
 )
 
-my_df_pivot$QuestionGroup = NA
+dataUX_pivot$QuestionGroup = NA
 
 for (i_question in 1:61){
   question = data_questions$Question_description[i_question]
   group = data_questions$QuestionGroup[i_question]
-  my_df_pivot$QuestionGroup[
-    which(my_df_pivot$QuestionName == question) ] = group
+  dataUX_pivot$QuestionGroup[
+    which(dataUX_pivot$QuestionName == question) ] = group
 }
 
 # Selecting only ``valid questions''
 # the two questions on speed questions with 3 being best, 5 and 1 being worst are labeled 0 and counted as "invalid"
 valid_questions = data_questions$Question_description[which(data_questions$ToBeInverted != 0)] 
-my_df_pivot = my_df_pivot[which(my_df_pivot$QuestionName %in% valid_questions), ]
+dataUX_pivot = dataUX_pivot[which(dataUX_pivot$QuestionName %in% valid_questions), ]
 
 # Scaling the values to be between 0 and 100.
-my_df_pivot$value = (my_df_pivot$value - 1) * 100 / 4
+dataUX_pivot$value = (dataUX_pivot$value - 1) * 100 / 4
 
 # Renaming SSQ to VR Sickness
-my_df_pivot$QuestionGroup = if_else(condition = my_df_pivot$QuestionGroup == "SSQ",
+dataUX_pivot$QuestionGroup = if_else(condition = dataUX_pivot$QuestionGroup == "SSQ",
                                     true = "VR Sickness",
-                                    false = my_df_pivot$QuestionGroup)
+                                    false = dataUX_pivot$QuestionGroup)
 ```
 
 # 2- Visualization
 
 ```{r}
-boxplot(value ~ QuestionName, data = my_df_pivot)
+boxplot(value ~ QuestionName, data = dataUX_pivot)
 
-boxplot(value ~ QuestionGroup, data = my_df_pivot)
+boxplot(value ~ QuestionGroup, data = dataUX_pivot)
 ```
 
 
 ```{r fig.height = 8, fig.width=10}
-# Filled box for each combination Condition/QuestionName
+# Filled box for each combination LocomotionTechnique/QuestionName
 
-my_df_pivot %>%
-  group_by(Condition, QuestionName) %>%
+dataUX_pivot %>%
+  group_by(LocomotionTechnique, QuestionName) %>%
   summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
   ungroup() %>%
   ggplot() +
-  geom_tile(aes(x = Condition, y = QuestionName,
+  geom_tile(aes(x = LocomotionTechnique, y = QuestionName,
                 fill = averageValue))
 
-# Filled box for each combination Condition/QuestionGroup
+# Filled box for each combination LocomotionTechnique/QuestionGroup
 
-my_df_pivot %>%
-  group_by(Condition, QuestionGroup) %>%
+dataUX_pivot %>%
+  group_by(LocomotionTechnique, QuestionGroup) %>%
   summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
   ungroup() %>%
   ggplot() +
-  geom_tile(aes(x = Condition, y = QuestionGroup, fill = averageValue)) +
-  geom_text(aes(x = Condition, y = QuestionGroup, label = round(averageValue, digits = 1))) +
+  geom_tile(aes(x = LocomotionTechnique, y = QuestionGroup, fill = averageValue)) +
+  geom_text(aes(x = LocomotionTechnique, y = QuestionGroup, label = round(averageValue, digits = 1))) +
   guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
-  xlab("Direction condition") + ylab("Question Group") +
+  xlab("Direction LocomotionTechnique") + ylab("Question Group") +
   scale_fill_gradient2(
     limits = c(0,100), breaks = seq(0, 100, by = 10), 
     midpoint = 50, low = "#141414", mid = "#193554", high = "#2dc6fc")
@@ -102,26 +103,26 @@ my_df_pivot %>%
 
 ```{r}
 my_model = lme4::lmer(
-  data = my_df_pivot,
-  value ~ Condition * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName)
+  data = dataUX_pivot,
+  value ~ LocomotionTechnique * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName)
 )
 
 summary(my_model)
 ```
 
-## 3.2 General effect of condition
+## 3.2 General effect of LocomotionTechnique
 
 ```{r}
-my_model_emmeans_condition = emmeans::emmeans(my_model, list(pairwise ~ Condition), adjust = "bonferroni")
-print(my_model_emmeans_condition)
+my_model_emmeans_LocomotionTechnique = emmeans::emmeans(my_model, list(pairwise ~ LocomotionTechnique), adjust = "bonferroni")
+print(my_model_emmeans_LocomotionTechnique)
 ```
 
 
-## 3.3 Differences in condition by QuestionGroup
+## 3.3 Differences in LocomotionTechnique by QuestionGroup
 
 ```{r}
-my_model_emmeans = emmeans::emmeans(my_model, ~ Condition | QuestionGroup)
-pairs(my_model_emmeans, simple = "Condition", adjust = "bonferroni")
+my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique | QuestionGroup)
+pairs(my_model_emmeans, simple = "LocomotionTechnique", adjust = "bonferroni")
 ```
 
 
