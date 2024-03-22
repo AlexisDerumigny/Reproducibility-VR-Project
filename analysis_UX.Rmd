@@ -1,5 +1,5 @@
 ---
-title: "Analysis"
+title: "Analysis of UX"
 date: "2023-04-17"
 output:
   html_document:
@@ -138,6 +138,8 @@ pairs(my_model_emmeans, simple = "LocomotionTechnique", adjust = "bonferroni")
 
 
 ```{r}
+#gt(as.data.frame(my_model_emmeans[, "p.value"]))
+#gt(as.data.frame(my_model_emmeans["p.value", ]))
 gt(as.data.frame(my_model_emmeans))
 ```
 
