@@ -8,10 +8,11 @@ output:
 ---
 
 # In Rstudio go to Tools > Install packages 
-# Into the bar type: knitr,tidyverse,lme4,emmeans
+# Into the bar type: knitr,tidyverse,lme4,emmeans,gt
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
+library(gt)
 
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
 ```
@@ -115,14 +116,29 @@ summary(my_model)
 ```{r}
 my_model_emmeans_LocomotionTechnique = emmeans::emmeans(my_model, list(pairwise ~ LocomotionTechnique), adjust = "bonferroni")
 print(my_model_emmeans_LocomotionTechnique)
-```
 
+```
+```{r}
+gt(as.data.frame(my_model_emmeans_LocomotionTechnique)) %>%
+  # tail(, -2) %>%
+  tab_header(
+    title = md("Pairwise comparison **UX scores locomotion techniques**"),
+    subtitle = md("`Pvalues` table")
+  ) #%>% 
+  #as_latex()
+
+```
 
 ## 3.3 Differences in LocomotionTechnique by QuestionGroup
 
 ```{r}
 my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique | QuestionGroup)
 pairs(my_model_emmeans, simple = "LocomotionTechnique", adjust = "bonferroni")
+```
+
+
+```{r}
+gt(as.data.frame(my_model_emmeans))
 ```
 
 
