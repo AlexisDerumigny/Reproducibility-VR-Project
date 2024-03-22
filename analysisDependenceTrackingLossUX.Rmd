@@ -143,6 +143,23 @@ summary(regtrackUXcor)
 ```
 
 
+# 4. Getting p-values automatically and adjustement of p-values
 
+```{r}
+regtrackUXcor <- lm(data = dataUXTrackingLoss,
+                      `Self-motion compellingness` ~ NrTrackerlosses)
+summary(regtrackUXcor)
+
+coef(summary(regtrackUXcor))[2, 4]
+coef(summary(regtrackUXcor))["NrTrackerlosses", "Pr(>|t|)"]
+
+# for lmer, it could be that you would use fixef() to get the fixed effects
+```
+
+
+```{r}
+vector_of_pvalues = c(test1 = 0.05, test2 = 0.02, test3 = 0.02455)
+p.adjust(vector_of_pvalues, method = "bonferroni")
+```
 
 
