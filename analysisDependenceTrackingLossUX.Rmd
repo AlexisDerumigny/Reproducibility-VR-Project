@@ -70,9 +70,7 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
   df_selectCol = dataUXTrackingLoss[, nameQuestions, drop = FALSE]
   for (i_Question in 1:length(nameQuestions)){
     nameOfQuestion = nameQuestions[i_Question]
-    if (selectedQuestions[i_Question, "ToBeInverted"] < 0){
-      df_selectCol[, nameOfQuestion] = - df_selectCol[, nameOfQuestion]
-    } else if (selectedQuestions[i_Question, "ToBeInverted"] == 0){
+    if (selectedQuestions[i_Question, "ToBeInverted"] == 0){
       df_selectCol[, nameOfQuestion] = - abs(3 - df_selectCol[, nameOfQuestion])
     }
   }
