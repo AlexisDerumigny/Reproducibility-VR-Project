@@ -56,8 +56,8 @@ dataUX_pivot$value = (dataUX_pivot$value - 1) * 100 / 4
 
 # Renaming SSQ to VR Sickness
 dataUX_pivot$QuestionGroup = if_else(condition = dataUX_pivot$QuestionGroup == "SSQ",
-                                    true = "VR Sickness",
-                                    false = dataUX_pivot$QuestionGroup)
+                                     true = "VR Sickness",
+                                     false = dataUX_pivot$QuestionGroup)
 ```
 
 # 2- Visualization
