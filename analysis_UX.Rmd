@@ -12,6 +12,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
+library(lmerTest)
 library(gt)
 
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
@@ -103,7 +104,7 @@ dataUX_pivot %>%
 
 
 ```{r}
-my_model = lme4::lmer(
+my_model = lmer(
   data = dataUX_pivot,
   value ~ LocomotionTechnique * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName)
 )

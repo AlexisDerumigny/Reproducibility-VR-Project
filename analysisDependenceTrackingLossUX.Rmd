@@ -30,7 +30,7 @@ cor((x1 + x2 + x3)/3, y) = correlation between averages
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
-
+library(lmerTest)
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
 ```
 
