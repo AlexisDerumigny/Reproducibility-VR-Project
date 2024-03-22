@@ -91,6 +91,23 @@ corMat = cor(dataUXTrackingLoss[, selectedQuestions], use = "pairwise.complete.o
 corrplot::corrplot(corMat, order = "hclust")
 ```
 
+```{r, fig.height=10, fig.width=10}
+ggplot(dataUXTrackingLoss) +
+  geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.1, height = 0.1)
+  
+dataUXTrackingLoss |>
+  mutate(ParticipantID = factor(ParticipantID)) |>
+  ggplot() +
+  geom_jitter(aes(Satisfaction, Intuitiveness, color = ParticipantID), width = 0.1, height = 0.1)
+
+dataUXTrackingLoss |>
+  mutate(ParticipantID = factor(ParticipantID)) |>
+  ggplot() +
+  geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.01, height = 0.01) +
+  facet_wrap(~ ParticipantID)
+  
+```
+
 
 ```{r, fig.height=12, fig.width=12}
 corTests = dataUXTrackingLoss[, selectedQuestions] |> 
