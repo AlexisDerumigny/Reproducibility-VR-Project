@@ -1,5 +1,5 @@
 ---
-title: "Analysis of tracking losses"
+title: "Analysis of time completion"
 date: "2023-04-19"
 output:
   html_document:
@@ -27,7 +27,7 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 
 
 ```{r}
-source("preparingTrackingLossData.R")
+source("preparingTimeData.R")
 ```
 
 
@@ -35,33 +35,34 @@ source("preparingTrackingLossData.R")
 
 ```{r}
 # this gives a histogram (y is the number of times a value is present)
-ggplot(dataTrackingLoss) +
-  geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5)
+ggplot(dataTime) +
+  geom_histogram(aes(x = completionTime), binwidth = 0.5)
 ```
 
 ```{r}
-ggplot(dataTrackingLoss) +
-  geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5) +
+# this gives for each participant thye completion times. But why don't some have any???
+ggplot(dataTime) +
+  geom_histogram(aes(x = completionTime), binwidth = 0.5) +
   facet_wrap(~ ParticipantID)
 ```
 
 ```{r}
-ggplot(dataTrackingLoss) +
-  geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5) +
+ggplot(dataTime) +
+  geom_histogram(aes(x = completionTime), binwidth = 0.5) +
   facet_wrap(~ LocomotionTechnique)
 ```
 
 # 3- Analysis
 
 ```{r}
-reg1 <- lmer(data = dataTrackingLoss,
-             NrTrackerlosses ~ LocomotionTechnique + (1 | ParticipantID))
+regTime <- lmer(data = dataTime,
+             completionTime ~ LocomotionTechnique + (1 | ParticipantID))
 
 summary(reg1)
 ```
 
 ```{r}
-my_model_emmeans = emmeans::emmeans(reg1, ~ LocomotionTechnique)
-pairs(my_model_emmeans, adjust = "none") #not adjusted. We desire to find insignificance, so we have to be extra strict on concluding any insignificance. If this would be adjusted, we would find insignificant results more easily.
+regTime_emmeans = emmeans::emmeans(regTime, ~ LocomotionTechnique)
+pairs(regTime_emmeans, adjust = "bonferroni") #adjusted, we desire to find significance, so we have to be extra careful on concluding significance. Adjusting for multiple comparisons makes it less likely we find any significant results.
 ```
 

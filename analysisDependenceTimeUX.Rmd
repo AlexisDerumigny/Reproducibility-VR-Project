@@ -1,5 +1,5 @@
 ---
-title: "Analysis of dependence between Tracking loss and UX"
+title: "Analysis of dependence between Time and UX"
 date: "2023-04-19"
 output:
   html_document:
@@ -7,9 +7,9 @@ output:
     toc_depth: 2
 ---
 This file is for the two hypothesis:
-- The trackerloss impacts certain factors of the user experience.
-The trackerloss initially was expected to impact intuitiveness, perceived errors, input responsiveness, control, self motion compellingness, and the questions on speed.
-From the correlation matrix this was further filtered to only test this for Control and Self motion compellingness, since these seemed to give the largest correlations.
+- The time taken impacts certain factors of the user experience.
+The time taken initially was expected to impact ...
+From the correlation matrix this was further filtered to only test this for ..., since these seemed to give the largest correlations.
 
 - 
 
@@ -39,14 +39,14 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 
 
 ```{r}
-source("preparingTrackingLossData.R")
+source("preparingTimeData.R")
 source("preparingUXdata.R")
 ```
 
 
 ```{r}
-dataUXTrackingLoss = full_join(
-  x = dataTrackingLoss |> select(! all_of("Index")),
+dataUXTime = full_join(
+  x = dataTime |> select(! all_of("Index")),
   y = dataUX |> mutate(ParticipantID = as.integer(ParticipantID)),
   by = c("ParticipantID", "LocomotionTechnique"),
   suffix = c(".x", ".y"),
@@ -67,7 +67,7 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
   
   nameQuestions = selectedQuestions$Question_description
   
-  df_selectCol = dataUXTrackingLoss[, nameQuestions, drop = FALSE]
+  df_selectCol = dataUXTime[, nameQuestions, drop = FALSE]
   for (i_Question in 1:length(nameQuestions)){
     nameOfQuestion = nameQuestions[i_Question]
     if (selectedQuestions[i_Question, "ToBeInverted"] < 0){
@@ -77,39 +77,39 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
     }
   }
   
-  dataUXTrackingLoss[, nameQuestionGroup] = rowMeans(df_selectCol)
+  dataUXTime[, nameQuestionGroup] = rowMeans(df_selectCol)
 }
 ```
 
 
 ```{r, fig.height=12, fig.width=12}
-dataUXTrackingLoss$NrTrackerlossesOp = - dataUXTrackingLoss$NrTrackerlosses #invert, so better = less tracker losses
+dataUXTime$completionTimeOp = - dataUXTime$completionTime #invert, so better = less time taken
 
-selectedQuestions = c(allQuestionsGroups, "NrTrackerlossesOp",
+selectedQuestions = c(allQuestionsGroups, "completionTimeOp",
                       "I think the virtual speed felt natural compared to normal walking",
                       "I wanted to move through the virtual environment")
 
-corMat = cor(dataUXTrackingLoss[, selectedQuestions], use = "pairwise.complete.obs")
+corMat = cor(dataUXTime[, selectedQuestions], use = "pairwise.complete.obs")
 corrplot::corrplot(corMat, order = "hclust")
 ```
 
 
 ```{r, fig.height=12, fig.width=12}
-corTests = dataUXTrackingLoss[, selectedQuestions] |> 
+corTests = dataUXTime[, selectedQuestions] |> 
   corrplot::cor.mtest(use = "pairwise.complete.obs")
 
 corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = 0.05, order = "hclust",
                    addrect = 2)
 ```
 ```{r}
-print(dataUXTrackingLoss$`Self-motion compellingness`)
+print(dataUXTime$`Self-motion compellingness`)
 ```
 
 ```{r}
 #trying to get the answer: are the Nr of TrackerLosses significantly correlated with Control and self-motion compellingness.
 
 #library(lme4)
-regtrackUXcor <- lmer(data = dataUXTrackingLoss, NrTrackerlosses ~ Control + `Self-motion compellingness` + (1 | ParticipantID) + (1|LocomotionTechnique))
+regtrackUXcor <- lmer(data = dataUXTime, completionTime ~ Control + `Self-motion compellingness` + (1 | ParticipantID) + (1|LocomotionTechnique))
 summary(regUXcor)
 ```
 
