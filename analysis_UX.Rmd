@@ -31,9 +31,11 @@ source("preparingUXdata.R")
 # Put in tidy format: one value per line
 # (repeat questions for each participant and each LocomotionTechnique)
 
+dataUX$orderCondition = sample.int(4, size = 80, replace = TRUE)
+
 dataUX_pivot = pivot_longer(
   data = dataUX, cols = !all_of(c("Timestamp", "ParticipantID" , 
-                                 "LocomotionTechnique")),
+                                  "LocomotionTechnique", "orderCondition")),
   names_to = "QuestionName"
 )
 
@@ -67,6 +69,18 @@ dataUX_pivot$QuestionGroup = if_else(condition = dataUX_pivot$QuestionGroup == "
 boxplot(value ~ QuestionName, data = dataUX_pivot)
 
 boxplot(value ~ QuestionGroup, data = dataUX_pivot)
+
+boxplot(value ~ orderCondition, data = dataUX_pivot)
+```
+
+```{r, fig.width=10, fig.height=20}
+ggplot(dataUX_pivot) +
+  geom_jitter(aes(x = orderCondition, y = value), width = 0.1, height = 1,
+              pch = ".")
+
+ggplot(dataUX_pivot) +
+  geom_jitter(aes(x = orderCondition, y = value), width = 0.1, height = 1) +
+  facet_wrap(~ QuestionGroup, ncol = 4)
 ```
 
 
@@ -107,7 +121,8 @@ dataUX_pivot %>%
 ```{r}
 my_model = lmer(
   data = dataUX_pivot,
-  value ~ LocomotionTechnique * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName)
+  value ~ LocomotionTechnique * QuestionGroup + orderCondition +
+    (1 | ParticipantID) + (1 | QuestionName)
 )
 
 summary(my_model)
@@ -176,11 +191,97 @@ print(result)
 ```
 
 
+# 4. Model the order effects
+
+# 4.1 First approach
+
 ```{r}
+grp_Hip1 = c(20, 8, 11, 18, 20)
+grp_Hip4 = c(1, 10, 16, 19)
+dataUX_pivot = dataUX_pivot %>%
+  mutate(grp_Hip = case_when(
+    ParticipantID %in% grp_Hip1 ~ 1,
+    ParticipantID %in% grp_Hip4 ~ 4
+  )) %>%
+  mutate(grp_Hip = factor(grp_Hip))
+
+reg1 = lmer(value ~ grp_Hip * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName),
+            data = dataUX_pivot |> filter(LocomotionTechnique == "Hip"))
+
+summary(reg1)
 ```
 
 
 ```{r}
+my_model_emmeans = emmeans::emmeans(reg1, ~ grp_Hip | QuestionGroup)
+result = pairs(my_model_emmeans, simple = "grp_Hip")
+print(result)
 ```
+
+
+# 4.2 Final approach
+
+```{r}
+my_model = lmer(
+  data = filter(dataUX_pivot, QuestionGroup == "VR Sickness"),
+  value ~ LocomotionTechnique * orderCondition +
+    (1 | ParticipantID)
+)
+
+summary(my_model)
+```
+
+
+```{r}
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | LocomotionTechnique)
+result = pairs(my_model_emmeans)
+print(result)
+```
+
+
+```{r}
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition )
+result = pairs(my_model_emmeans)
+print(result)
+```
+
+
+
+```{r}
+dataUX_pivot = dataUX_pivot |>
+  mutate(LocomotionTechniqueOrder = paste(LocomotionTechnique, orderCondition, sep = ""))
+
+my_model = lmer(
+  data = dataUX_pivot,
+  value ~ LocomotionTechnique * QuestionGroup + LocomotionTechniqueOrder +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+
+summary(my_model)
+```
+
+
+```{r}
+my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechniqueOrder )
+result = pairs(my_model_emmeans)
+print(result)
+```
+
+
+```{r}
+my_model = lmer(
+  data = dataUX_pivot,
+  value ~ LocomotionTechnique * QuestionGroup + LocomotionTechnique * orderCondition +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+
+summary(my_model)
+my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique * orderCondition )
+```
+
+```{r, fig.height=8, fig.width=12}
+emmeans::pwpp(my_model_emmeans)
+```
+
 
 
