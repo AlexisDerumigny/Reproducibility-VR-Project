@@ -39,10 +39,10 @@ ggplot(dataTime) +
   geom_histogram(aes(x = completionTime), binwidth = 0.5)
 ```
 
-```{r}
-# this gives for each participant thye completion times. But why don't some have any???
+```{r, fig.height=8, fig.width=8}
+# this gives for each participant the completion times. But why don't some have any???
 ggplot(dataTime) +
-  geom_histogram(aes(x = completionTime), binwidth = 0.5) +
+  geom_histogram(aes(x = completionTime), binwidth = 10) +
   facet_wrap(~ ParticipantID)
 ```
 
@@ -58,7 +58,7 @@ ggplot(dataTime) +
 regTime <- lmer(data = dataTime,
              completionTime ~ LocomotionTechnique + (1 | ParticipantID))
 
-summary(reg1)
+summary(regTime)
 ```
 
 ```{r}
