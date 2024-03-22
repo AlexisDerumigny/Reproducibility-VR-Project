@@ -4,10 +4,12 @@ con <- file("UXdata2023-04-28.csv", "r", blocking = FALSE)
 
 data = readLines(con)
 close.connection(con)
+rm(con)
 
 df = strsplit(data, split=";")
+rm(data)
 
-n_row = length(data)
+n_row = length(df)
 n_col = 64
 
 dataUX = matrix(nrow = n_row - 1, ncol = n_col)
@@ -15,7 +17,9 @@ for (i in 1:(n_row-1)){
   for (j in 1:n_col){
     dataUX[i,j] = df[[i+1]][j]
   }
-} 
+}
+rm(i, j, n_col, n_row)
+
 dataUX = as.data.frame.matrix(dataUX)
 
 
@@ -53,7 +57,7 @@ for (i_question in 1:61){
     dataUX[, i_question + 3] = as.numeric(dataUX[, i_question + 3])            # else, keep default scaling.
   }
 } 
-
+rm(i_question)
 
 # Fixing column names
 
