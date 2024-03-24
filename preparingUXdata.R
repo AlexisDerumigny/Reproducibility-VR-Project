@@ -23,20 +23,37 @@ dataUX <- dataUX %>%
 data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same also for the dataset at 2023-04-28, so does not have to be changed 
                           sep = ";")
 
-# here questions are inverted if 1 is best, and 5 is worst.
-# additionally there are some questions on speed and direction, where 3 is best, and 1 and 5 are worst. (speed/direction too fast/slow) These are corrected here.
+# This is the number of columns in the data.frame `dataUX` that are present
+# before the start of the questions.
+offSet_questions_in_data_UX = 4
+
+# Here questions are inverted if 1 is best, and 5 is worst.
+# additionally there are some questions on speed and direction,
+# where 3 is best, and 1 and 5 are worst. (speed/direction too fast/slow).
+# These are corrected here.
+
 for (i_question in 1:61){
+  indexColumnQuestion = i_question + offSet_questions_in_data_UX
   if (data_questions$ToBeInverted[i_question] == -1){
-    dataUX[, i_question + 3] = 6 - as.numeric(dataUX[, i_question + 3])        #invert if 1 is best and 5 is worst, to 1 is worst and 5 is best
-  } else if (data_questions$ToBeInverted[i_question] == -2){                 
-    dataUX[, i_question + 3] = 5 - as.numeric(dataUX[, i_question + 3]) * 4/3  # this scaling is for the VR sickness questions since those are Likert scale 0 to 3, and should now be mapped from 1 to 5 to normalize
+    
+    dataUX[, indexColumnQuestion] = 6 - as.numeric(dataUX[, indexColumnQuestion])
+    # Invert if 1 is best and 5 is worst, to 1 is worst and 5 is best
+    
+  } else if (data_questions$ToBeInverted[i_question] == -2) {
+    
+    dataUX[, indexColumnQuestion] = 5 - as.numeric(dataUX[, indexColumnQuestion]) * 4/3
+    # This scaling is for the VR sickness questions since those are Likert scale 0 to 3,
+    # and should now be mapped from 1 to 5 to normalize.
+    
   } else {
-    dataUX[, i_question + 3] = as.numeric(dataUX[, i_question + 3])            # else, keep default scaling.
+    dataUX[, indexColumnQuestion] = as.numeric(dataUX[, indexColumnQuestion])
+    # else, keep default scaling and convert to `numeric` type.
   }
-} 
-rm(i_question)
+}
+# Cleaning up unused variables
+rm(i_question, offSet_questions_in_data_UX)
+
 
 # Fixing column names
-
 colnames(dataUX)[which(colnames(dataUX) == "Condition")] = "LocomotionTechnique"
 
