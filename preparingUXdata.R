@@ -5,12 +5,12 @@ dataUX = read.csv(
 )
 
 colnames(dataUX)[2] = "ParticipantID"
-colnames(dataUX)[3] = "Condition"
+colnames(dataUX)[3] = "LocomotionTechnique"
 
 
 dataUX <- dataUX %>%
-  mutate(Condition =
-           factor(recode(Condition,
+  mutate(LocomotionTechnique =
+           factor(recode(LocomotionTechnique,
                          HED = 'Head', HIP = 'Hip',
                          STF = 'StandingFootVelocity', AVG =  'AverageShoes' ),
                   levels = c("Head", "Hip",
@@ -52,8 +52,4 @@ for (i_question in 1:61){
 }
 # Cleaning up unused variables
 rm(i_question, offSet_questions_in_data_UX)
-
-
-# Fixing column names
-colnames(dataUX)[which(colnames(dataUX) == "Condition")] = "LocomotionTechnique"
 
