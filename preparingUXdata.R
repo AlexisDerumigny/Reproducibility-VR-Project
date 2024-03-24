@@ -13,7 +13,8 @@ dataUX <- dataUX %>%
                          STF = 'StandingFootVelocity', AVG =  'AverageShoes' ),
                   levels = c("Head", "Hip",
                              "StandingFootVelocity", "AverageShoes")
-           ) )
+           ),
+         orderCondition = factor(orderCondition, levels = 1:4))
 
 
 # Loading data questions =======================================================
