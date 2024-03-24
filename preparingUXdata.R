@@ -1,35 +1,12 @@
 # Loading UX data ===========================================================
 
-con <- file("UXdata2023-04-28.csv", "r", blocking = FALSE)
-
-data = readLines(con)
-close.connection(con)
-rm(con)
-
-df = strsplit(data, split=";")
-rm(data)
-
-n_row = length(df)
-n_col = 65
-
-dataUX = matrix(nrow = n_row - 1, ncol = n_col)
-for (i in 1:(n_row-1)){
-  for (j in 1:n_col){
-    dataUX[i,j] = df[[i+1]][j]
-  }
-}
-rm(i, j, n_col, n_row)
-
-dataUX = as.data.frame.matrix(dataUX)
-
-
-colnames(dataUX) <- df[[1]]
+dataUX = read.csv(
+  file = "UXdata2023-04-28.csv", sep = ";"
+)
 
 colnames(dataUX)[2] = "ParticipantID"
 colnames(dataUX)[3] = "Condition"
 
-# df not used anymore
-rm(df)
 
 dataUX <- dataUX %>%
   mutate(Condition =
