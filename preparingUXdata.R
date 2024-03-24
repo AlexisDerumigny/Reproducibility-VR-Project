@@ -1,6 +1,6 @@
 # Loading UX data ==============================================================
 
-dataUX = read.csv(file = "UXdata2023-04-28.csv", sep = ";")
+dataUX = read.csv(file = "UXdata2023-04-28.csv", sep = ";", check.names	= FALSE)
 
 colnames(dataUX)[2] = "ParticipantID"
 colnames(dataUX)[3] = "LocomotionTechnique"
