@@ -19,7 +19,7 @@ dataUX <- dataUX %>%
 
 # Loading data questions =======================================================
 
-# This is the same also for the dataset at 2023-04-28, so does not have to be changed 
+# This is the same also for the dataset at 2023-04-28, so does not have to be changed.
 data_questions = read.csv("UXdata_questions2023-04-17.csv", sep = ";")
 
 # This is the number of columns in the data.frame `dataUX` that are present
@@ -30,7 +30,7 @@ offSet_questions_in_data_UX = 4
 # additionally there are some questions on speed and direction,
 # where 3 is best, and 1 and 5 are worst. (speed/direction too fast/slow).
 # These are corrected here.
-# This also convert all questions to the `numeric` type.
+# This also converts all questions to the `numeric` type.
 
 for (i_question in 1:61){
   indexColumnQuestion = i_question + offSet_questions_in_data_UX
