@@ -1,8 +1,6 @@
-# Loading UX data ===========================================================
+# Loading UX data ==============================================================
 
-dataUX = read.csv(
-  file = "UXdata2023-04-28.csv", sep = ";"
-)
+dataUX = read.csv(file = "UXdata2023-04-28.csv", sep = ";")
 
 colnames(dataUX)[2] = "ParticipantID"
 colnames(dataUX)[3] = "LocomotionTechnique"
@@ -18,10 +16,10 @@ dataUX <- dataUX %>%
            ) )
 
 
-# Loading data questions ============================================
+# Loading data questions =======================================================
 
-data_questions = read.csv("UXdata_questions2023-04-17.csv", #this is the same also for the dataset at 2023-04-28, so does not have to be changed 
-                          sep = ";")
+# This is the same also for the dataset at 2023-04-28, so does not have to be changed 
+data_questions = read.csv("UXdata_questions2023-04-17.csv", sep = ";")
 
 # This is the number of columns in the data.frame `dataUX` that are present
 # before the start of the questions.
@@ -31,6 +29,7 @@ offSet_questions_in_data_UX = 4
 # additionally there are some questions on speed and direction,
 # where 3 is best, and 1 and 5 are worst. (speed/direction too fast/slow).
 # These are corrected here.
+# This also convert all questions to the `numeric` type.
 
 for (i_question in 1:61){
   indexColumnQuestion = i_question + offSet_questions_in_data_UX
@@ -50,6 +49,7 @@ for (i_question in 1:61){
     # else, keep default scaling and convert to `numeric` type.
   }
 }
+
 # Cleaning up unused variables
 rm(i_question, offSet_questions_in_data_UX)
 
