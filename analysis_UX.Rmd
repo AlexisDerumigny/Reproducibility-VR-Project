@@ -31,7 +31,7 @@ source("preparingUXdata.R")
 # Put in tidy format: one value per line
 # (repeat questions for each participant and each LocomotionTechnique)
 
-dataUX$orderCondition = sample.int(4, size = 80, replace = TRUE)
+#dataUX$orderCondition = sample.int(4, size = 80, replace = TRUE)
 
 dataUX_pivot = pivot_longer(
   data = dataUX, cols = !all_of(c("Timestamp", "ParticipantID" , 

@@ -10,7 +10,7 @@ df = strsplit(data, split=";")
 rm(data)
 
 n_row = length(df)
-n_col = 64
+n_col = 65
 
 dataUX = matrix(nrow = n_row - 1, ncol = n_col)
 for (i in 1:(n_row-1)){
