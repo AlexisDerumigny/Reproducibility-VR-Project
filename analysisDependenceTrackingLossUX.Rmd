@@ -92,6 +92,8 @@ corrplot::corrplot(corMat, order = "hclust")
 ```
 
 ```{r, fig.height=10, fig.width=10}
+## This further analyzes the correlations in the table above individually. Fill in 2 of your choice, and get data relations between them. These were some plots we made earlier because of an error in the data. We were trying to figure out why some values were unlogically negatively correlated, and checked if this was due to the Simpsons effect, where if and extra variable (aka participant) is not taken into account, the trend will be different. (For each participant it would go upward, while in total it would go downward). This was not the case, and in the end the weird values were caused by a wrong double inversion (therefore not inverting questions that should be inverted).
+
 ggplot(dataUXTrackingLoss) +
   geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.1, height = 0.1)
   
@@ -144,8 +146,10 @@ summary(regtrackUXcor)
 
 
 # 4. Getting p-values automatically and adjustement of p-values
+# do not use anything below, they are for explanation purposes
 
 ```{r}
+# this would be with a regular linear model with no random effect for the participant, or fixed effect for the locomotion effect. This happens if you draw a line through all datapoints ignoring the participant. There could be a trend per participant and per locomotion technique. If taking these into account, it could be it is not correlated at all. This shows that, since this would be a significant effect, but taking account the participant and locomotion technique (above) it is not. (Do not use this outcome)
 regtrackUXcor <- lm(data = dataUXTrackingLoss,
                       `Self-motion compellingness` ~ NrTrackerlosses)
 summary(regtrackUXcor)
@@ -157,7 +161,8 @@ coef(summary(regtrackUXcor))["NrTrackerlosses", "Pr(>|t|)"]
 ```
 
 
-```{r}
+```{r} 
+#example of how to perform multiple comparison correction with separate values. However, this is usually not done except if there are many comparisons.
 vector_of_pvalues = c(test1 = 0.05, test2 = 0.02, test3 = 0.02455)
 p.adjust(vector_of_pvalues, method = "bonferroni")
 ```
