@@ -196,6 +196,8 @@ print(result)
 # 4.1 First approach
 
 ```{r}
+# This compares hip as 1st experiment to hip as 4th experiment in a subject for each question group.
+# By looking up the numbers in the latin square where a condition (hip) was first and last, and noting them in the list, these can be compared below.
 grp_Hip1 = c(20, 8, 11, 18, 20)
 grp_Hip4 = c(1, 10, 16, 19)
 dataUX_pivot = dataUX_pivot %>%
@@ -213,8 +215,9 @@ summary(reg1)
 
 
 ```{r}
+#  comparing hip 1 and 4 per question group:
 my_model_emmeans = emmeans::emmeans(reg1, ~ grp_Hip | QuestionGroup)
-result = pairs(my_model_emmeans, simple = "grp_Hip")
+result = pairs(my_model_emmeans, simple = "grp_Hip", adjust = "bonferroni") #adjust makes no difference here. Is this done correctly?
 print(result)
 ```
 
@@ -222,6 +225,8 @@ print(result)
 # 4.2 Final approach
 
 ```{r}
+# all data computed in all blocks below looks for a single questionGroup filtered here (VR sickness)
+# modelled as direction condition interaction effect with order, considering random effect for participant.
 my_model = lmer(
   data = filter(dataUX_pivot, QuestionGroup == "VR Sickness"),
   value ~ LocomotionTechnique * orderCondition +
@@ -232,19 +237,21 @@ summary(my_model)
 ```
 
 
-```{r}
-my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | LocomotionTechnique)
-result = pairs(my_model_emmeans)
-print(result)
-```
+
 
 
 ```{r}
+#When looking over all user tests for the Question, there was a significant difference between the first and third experiment on a single subject (p=0.037) and a non-significant difference between first and fourth experiment on a single subject (p=0.0651). 
 my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition )
-result = pairs(my_model_emmeans)
+result = pairs(my_model_emmeans, adjust = "bonferroni")
 print(result)
 ```
-
+```{r} 
+# However, the order did not influence the overall UX score comparison between conditions: within a condition there was no significant difference between a direction condition being tested as first, second, third or last (p>0.28).
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | LocomotionTechnique)
+result = pairs(my_model_emmeans, adjust = "bonferroni")
+print(result)
+```
 
 
 ```{r}
@@ -263,7 +270,7 @@ summary(my_model)
 
 ```{r}
 my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechniqueOrder )
-result = pairs(my_model_emmeans)
+result = pairs(my_model_emmeans, adjust="bonferroni")
 print(result)
 ```
 
@@ -276,7 +283,7 @@ my_model = lmer(
 )
 
 summary(my_model)
-my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique * orderCondition )
+my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique * orderCondition, adjust="bonferroni") # this adjust does nothing, how to do this?
 ```
 
 ```{r, fig.height=8, fig.width=12}

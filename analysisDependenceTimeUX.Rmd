@@ -105,22 +105,22 @@ corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = 0.05, order = "hclust
 print(dataUXTime$`Self-motion compellingness`)
 ```
 
-```{r}
-#trying to get the answer: are the Nr of TrackerLosses significantly correlated with Control and self-motion compellingness.
 
-#library(lme4)
-regtrackUXcor <- lmer(data = dataUXTime, completionTime ~ Control + `Self-motion compellingness` + (1 | ParticipantID) + (1|LocomotionTechnique))
-summary(regUXcor)
-```
 
-```{r}
-# this is trying to use emmeans copying what is already there in the other projects, but I don't think this is the way to do that with multiple fixed conditions
-regtrackUXcor_emmeans = emmeans::emmeans(regtrackUXcor, ~  Control + `Self-motion compellingness`)
-pairs(regtrackUXcor_emmeans, adjust = "bonferroni")
-```
 
 
 # 3- Modeling
 
+```{r}
+dataUXTime_pivot = dataUXTime |>
+  mutate(LocomotionTechniqueOrder = paste(LocomotionTechnique, orderCondition, sep = ""))
 
+my_model = lmer(
+  data = dataUXTime_pivot,
+  completionTimeOp ~ LocomotionTechnique * QuestionGroup + LocomotionTechniqueOrder +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+
+summary(my_model)
+```
 
