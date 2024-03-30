@@ -163,7 +163,7 @@ print(result)
 ```{r}
 result_df = as.data.frame(result)
 
-mytable = result_df[, c(2, 1, 3, 4, 7)] %>%
+mytable = result_df[, c(2, 1, 3, 4, 7)] %>% # this gives the order of columns
   group_by(QuestionGroup) %>%
   gt() |>
   fmt_scientific(
@@ -188,6 +188,29 @@ mymodel = lm(data = dataUX_pivot_Speed,
 my_model_emmeans = emmeans::emmeans(mymodel, ~ LocomotionTechnique | QuestionName)
 result = pairs(my_model_emmeans, simple = "LocomotionTechnique")
 print(result)
+
+print("Mean conditions too slow/fast compared to natural walking question")
+mean(filter(dataUX_pivot_Speed, QuestionName == "I think the virtual speed felt natural compared to normal walking")$value)
+print("Mean conditions I wanted to go slower/faster question")
+mean(filter(dataUX_pivot_Speed, QuestionName == "I wanted to move through the virtual environment")$value)
+
+
+result_df = as.data.frame(result)
+
+mytable = result_df[, c(2, 1, 3, 4, 7)] %>% # this gives the order of columns
+  group_by(QuestionName) %>%
+  gt() |>
+  fmt_scientific(
+    columns = c(estimate, SE)
+  ) |>
+  fmt_number(
+    columns = p.value, 
+    decimals = 4
+  )
+
+print(mytable)
+
+cat(as_latex(mytable))
 ```
 
 
@@ -234,7 +257,46 @@ my_model = lmer(
 )
 
 summary(my_model)
+
+model_df <- as.data.frame(coef(summary(my_model)))#[, c(1, 2, 3, 4, 5)]
+model_df <- data.frame("names"=rownames(model_df), model_df)
+VRsicknessTable <- model_df %>%
+  rename(
+  `p.value` = `Pr...t..`,
+  `Std. Error` = Std..Error
+  ) %>%
+  select(`names`, Estimate, `Std. Error`, `p.value`) %>%
+  gt() %>%
+    fmt_number(
+    columns = Estimate, 
+    decimals = 4
+  ) %>%
+    fmt_number(
+    columns = `Std. Error`, 
+    decimals = 4
+  ) %>%
+  fmt_number(
+    columns = `p.value`, 
+    decimals = 4
+  ) %>%
+  # tail(, -2) %>%
+  tab_header(
+    title = md("Comparison **VR sickness**"),
+    subtitle = md("`Pvalues` table")
+  ) #%>% 
+#as_latex()
+
+print(VRsicknessTable)
+
+cat(as_latex(VRsicknessTable))
+
+  
+
 ```
+
+
+
+
 
 
 

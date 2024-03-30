@@ -59,10 +59,60 @@ regTime <- lmer(data = dataTime,
              completionTime ~ LocomotionTechnique + (1 | ParticipantID))
 
 summary(regTime)
+
+
+# model_df <- as.data.frame(coef(summary(regTime)))#[, c(1, 2, 3, 4, 5)]
+# model_df <- data.frame("names"=rownames(model_df), model_df)
+# completionTimeTable <- model_df %>%
+#   rename(
+#   `p.value` = `Pr...t..`,
+#   `Std. Error` = Std..Error
+#   ) %>%
+#   select(`names`, Estimate, `Std. Error`, `p.value`) %>%
+#   gt() %>%
+#     fmt_number(
+#     columns = Estimate, 
+#     decimals = 4
+#   ) %>%
+#     fmt_number(
+#     columns = `Std. Error`, 
+#     decimals = 4
+#   ) %>%
+#   fmt_number(
+#     columns = `p.value`, 
+#     decimals = 4
+#   ) %>%
+#   # tail(, -2) %>%
+#   tab_header(
+#     title = md("Comparison **VR sickness**"),
+#     subtitle = md("`Pvalues` table")
+#   ) #%>% 
+# #as_latex()
+# 
+# print(completionTimeTable)
+# 
+# cat(as_latex(completionTimeTable))
 ```
 
 ```{r}
 regTime_emmeans = emmeans::emmeans(regTime, ~ LocomotionTechnique)
-pairs(regTime_emmeans, adjust = "bonferroni") #adjusted, we desire to find significance, so we have to be extra careful on concluding significance. Adjusting for multiple comparisons makes it less likely we find any significant results.
+result <- pairs(regTime_emmeans, adjust = "bonferroni") #adjusted, we desire to find significance, so we have to be extra careful on concluding significance. Adjusting for multiple comparisons makes it less likely we find any significant results.
+
+
+completionTimeTable <- result %>%
+  as.data.frame() %>%
+  # mutate(`Name of difference` = `1`) %>%
+  select(`contrast`, estimate, SE, p.value) %>%
+  gt() %>%
+  # tail(, -2) %>%
+  tab_header(
+    title = md("Pairwise comparison **UX scores locomotion techniques**"),
+    subtitle = md("`Pvalues` table")
+  ) #%>% 
+
+print(completionTimeTable)
+
+cat(as_latex(completionTimeTable))
+
 ```
 
