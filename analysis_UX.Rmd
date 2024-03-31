@@ -105,10 +105,13 @@ dataUX_pivot %>%
   geom_tile(aes(x = LocomotionTechnique, y = QuestionGroup, fill = averageValue)) +
   geom_text(aes(x = LocomotionTechnique, y = QuestionGroup, label = round(averageValue, digits = 1))) +
   guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
-  xlab("Direction LocomotionTechnique") + ylab("Question Group") +
+  xlab("Direction LocomotionTechnique") + ylab("Question Group")
   scale_fill_gradient2(
-    limits = c(0,100), breaks = seq(0, 100, by = 10), 
-    midpoint = 50, low = "#141414", mid = "#193554", high = "#2dc6fc")
+    limits = c(0,100), 
+    breaks = seq(0, 100, by = 10), 
+    low = "#141414", mid = "#193554", high = "#2dc6fc", midpoint = 50,
+    )
+    
 ```
 
 
@@ -132,24 +135,31 @@ summary(my_model)
 
 ```{r}
 my_model_emmeans_LocomotionTechnique = emmeans::emmeans(my_model, list(pairwise ~ LocomotionTechnique), adjust = "bonferroni")
-print(my_model_emmeans_LocomotionTechnique)
+#print(my_model_emmeans_LocomotionTechnique)
+result <- pairs(my_model_emmeans_LocomotionTechnique, adjust = "bonferroni")
 
-```
-
-```{r}
-my_model_emmeans_LocomotionTechnique$`pairwise differences of LocomotionTechnique` %>%
+UXConditionTable <- result %>%
   as.data.frame() %>%
-  mutate(`Name of difference` = `1`) %>%
-  select(`Name of difference`, estimate, SE, p.value) %>%
+  # mutate(`Name of difference` = `1`) %>%
+  select(`contrast`, estimate, SE, p.value) %>%
   gt() %>%
   # tail(, -2) %>%
   tab_header(
     title = md("Pairwise comparison **UX scores locomotion techniques**"),
     subtitle = md("`Pvalues` table")
-  ) #%>% 
-#as_latex()
+  ) %>% 
+   fmt_number(
+    columns = p.value, 
+    decimals = 10
+  )
+
+print(UXConditionTable)
+
+cat(as_latex(UXConditionTable))
 
 ```
+
+
 
 ## 3.3 Differences in LocomotionTechnique by QuestionGroup
 
@@ -157,6 +167,8 @@ my_model_emmeans_LocomotionTechnique$`pairwise differences of LocomotionTechniqu
 my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique | QuestionGroup)
 result = pairs(my_model_emmeans, simple = "LocomotionTechnique", adjust = "bonferroni")
 print(result)
+
+
 ```
 
 
