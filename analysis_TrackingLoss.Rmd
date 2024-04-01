@@ -62,6 +62,26 @@ summary(reg1)
 
 ```{r}
 my_model_emmeans = emmeans::emmeans(reg1, ~ LocomotionTechnique)
-pairs(my_model_emmeans, adjust = "none") #not adjusted. We desire to find insignificance, so we have to be extra strict on concluding any insignificance. If this would be adjusted, we would find insignificant results more easily.
+result <- pairs(my_model_emmeans, adjust = "none") #not adjusted. We desire to find insignificance, so we have to be extra strict on concluding any insignificance. If this would be adjusted, we would find insignificant results more easily.
+
+trackingLossTable <- result %>%
+  as.data.frame() %>%
+  # mutate(`Name of difference` = `1`) %>%
+  select(`contrast`, estimate, SE, p.value) %>%
+  gt() %>%
+  # tail(, -2) %>%
+  tab_header(
+    title = md("Pairwise comparison **tracking loss locomotion techniques**"),
+    subtitle = md("`Pvalues` table")
+  ) %>% 
+   fmt_number(
+    columns = p.value, 
+    decimals = 4
+  )
+
+print(trackingLossTable)
+
+cat(as_latex(trackingLossTable))
 ```
 
+```
