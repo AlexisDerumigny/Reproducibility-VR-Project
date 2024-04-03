@@ -18,6 +18,21 @@ library(gt)
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
 ```
 
+
+```{r}
+# Adding diagnostics via R session information
+print(sessionInfo())
+```
+
+```{r}
+currentCommit = gitr::get_commit_msgs(n = 1)[[1]]
+# Commit message
+print(currentCommit[1])
+# Commit SHA
+print(attr(currentCommit, "sha"))
+```
+
+
 # 1- Data loading and preprocessing
 
 ```{r}
