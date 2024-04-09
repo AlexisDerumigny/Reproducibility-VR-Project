@@ -81,14 +81,36 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
 
 
 ```{r, fig.height=12, fig.width=12}
+allQuestionsGroups = unique(data_questions$QuestionGroup)
 dataUXTime$completionTimeOp = - dataUXTime$completionTime #invert, so better = less time taken
 
 selectedQuestions = c(allQuestionsGroups, "completionTimeOp",
                       "I think the virtual speed felt natural compared to normal walking",
                       "I wanted to move through the virtual environment")
 
-corMat = cor(dataUXTime[, selectedQuestions], use = "pairwise.complete.obs")
+
+dataCorMat = dataUXTime[, selectedQuestions] %>%
+  rename(
+    `Natural speed` = `I think the virtual speed felt natural compared to normal walking`,
+    `Desired speed` = `I wanted to move through the virtual environment`,
+    `Faster completion time` = `completionTimeOp`,
+    `Less VR sickness` = `SSQ`,
+    `Fewer perceived errors` = `Perceived Errors`,
+    `Reduced Mental Effort` = `Mental Effort`,
+    `Reduced Physical Effort` = `Perceived Physical Effort`
+    ) %>%
+   subset(select = -c(`Virtual speed`) ) 
+
+corMat = cor(dataCorMat, use = "pairwise.complete.obs")
 corrplot::corrplot(corMat, order = "hclust")
+```
+
+```{r, fig.height=12, fig.width=12}
+# corTests = dataUXTrackingLoss[, selectedQuestions] |>
+corTests = dataCorMat %>%
+   corrplot::cor.mtest(use = "pairwise.complete.obs")
+
+corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = c(0.001, 0.01, 0.05), insig = 'label_sig', pch.cex = 0.9, order = "hclust" ) #,                 addrect = 2
 ```
 
 
