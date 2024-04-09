@@ -1,0 +1,25 @@
+---
+title: "Analysis of order effects for UX"
+date: "2023-04-17"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
+library(tidyverse)
+library(lmerTest)
+library(gt)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+
+# 1- Data loading and preprocessing
+
+```{r}
+source("preparingData.R")
+```
+
