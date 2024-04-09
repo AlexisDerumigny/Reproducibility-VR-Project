@@ -55,7 +55,7 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
   
   nameQuestions = selectedQuestions$Question_description
   
-  df_selectCol = dataUXTrackingLoss[, nameQuestions, drop = FALSE]
+  df_selectCol = data_all[, nameQuestions, drop = FALSE]
   for (i_Question in 1:length(nameQuestions)){
     nameOfQuestion = nameQuestions[i_Question]
     if (selectedQuestions[i_Question, "ToBeInverted"] == 0){
@@ -63,19 +63,19 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
     }
   }
   
-  dataUXTrackingLoss[, nameQuestionGroup] = rowMeans(df_selectCol)
+  data_all[, nameQuestionGroup] = rowMeans(df_selectCol)
 }
 ```
 
 
 ```{r, fig.height=12, fig.width=12}
-dataUXTrackingLoss$NrTrackerlossesOp = - dataUXTrackingLoss$NrTrackerlosses #invert, so better = less tracker losses
+data_all$NrTrackerlossesOp = - data_all$NrTrackerlosses #invert, so better = less tracker losses
 
 selectedQuestions = c(allQuestionsGroups, "NrTrackerlossesOp",
                       "I think the virtual speed felt natural compared to normal walking",
                       "I wanted to move through the virtual environment")
 
-dataCorMat = dataUXTrackingLoss[, selectedQuestions] %>%
+dataCorMat = data_all[, selectedQuestions] %>%
   rename(
     `Natural speed` = `I think the virtual speed felt natural compared to normal walking`,
     `Desired speed` = `I wanted to move through the virtual environment`,
@@ -95,15 +95,15 @@ corrplot::corrplot(corMat, order = "hclust")
 ```{r, fig.height=10, fig.width=10}
 ## This further analyzes the correlations in the table above individually. Fill in 2 of your choice, and get data relations between them. These were some plots we made earlier because of an error in the data. We were trying to figure out why some values were unlogically negatively correlated, and checked if this was due to the Simpsons effect, where if and extra variable (aka participant) is not taken into account, the trend will be different. (For each participant it would go upward, while in total it would go downward). This was not the case, and in the end the weird values were caused by a wrong double inversion (therefore not inverting questions that should be inverted).
 
-ggplot(dataUXTrackingLoss) +
+ggplot(data_all) +
   geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.1, height = 0.1)
   
-dataUXTrackingLoss |>
+data_all |>
   mutate(ParticipantID = factor(ParticipantID)) |>
   ggplot() +
   geom_jitter(aes(Satisfaction, Intuitiveness, color = ParticipantID), width = 0.1, height = 0.1)
 
-dataUXTrackingLoss |>
+data_all |>
   mutate(ParticipantID = factor(ParticipantID)) |>
   ggplot() +
   geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.01, height = 0.01) +
@@ -113,14 +113,14 @@ dataUXTrackingLoss |>
 
 
 ```{r, fig.height=12, fig.width=12}
-# corTests = dataUXTrackingLoss[, selectedQuestions] |>
+# corTests = data_all[, selectedQuestions] |>
 corTests = dataCorMat %>%
    corrplot::cor.mtest(use = "pairwise.complete.obs")
 
 corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = c(0.001, 0.01, 0.05), insig = 'label_sig', pch.cex = 0.9, order = "hclust" ) #,                 addrect = 2
 ```
 ```{r}
-print(dataUXTrackingLoss$`Self-motion compellingness`)
+print(data_all$`Self-motion compellingness`)
 ```
 
 
@@ -129,7 +129,7 @@ print(dataUXTrackingLoss$`Self-motion compellingness`)
 # 3.1- Influence of NrTrackerlosses on Control
 
 ```{r}
-regtrackUXcor <- lmer(data = dataUXTrackingLoss,
+regtrackUXcor <- lmer(data = data_all,
                       Control ~ NrTrackerlosses + 
                         (1 | ParticipantID) + LocomotionTechnique)
 summary(regtrackUXcor)
@@ -139,7 +139,7 @@ summary(regtrackUXcor)
 # 3.2- Influence of NrTrackerlosses on Self-motion compellingness
 
 ```{r}
-regtrackUXcor <- lmer(data = dataUXTrackingLoss,
+regtrackUXcor <- lmer(data = data_all,
                       `Self-motion compellingness` ~ NrTrackerlosses + 
                         (1 | ParticipantID) + LocomotionTechnique)
 summary(regtrackUXcor)
@@ -151,7 +151,7 @@ summary(regtrackUXcor)
 
 ```{r}
 # this would be with a regular linear model with no random effect for the participant, or fixed effect for the locomotion effect. This happens if you draw a line through all datapoints ignoring the participant. There could be a trend per participant and per locomotion technique. If taking these into account, it could be it is not correlated at all. This shows that, since this would be a significant effect, but taking account the participant and locomotion technique (above) it is not. (Do not use this outcome)
-regtrackUXcor <- lm(data = dataUXTrackingLoss,
+regtrackUXcor <- lm(data = data_all,
                       `Self-motion compellingness` ~ NrTrackerlosses)
 summary(regtrackUXcor)
 

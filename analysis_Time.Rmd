@@ -18,6 +18,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
 library(lme4)
+library(gt)
 
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
 ```
@@ -35,19 +36,19 @@ source("preparingData.R")
 
 ```{r}
 # this gives a histogram (y is the number of times a value is present)
-ggplot(dataTime) +
+ggplot(data_all) +
   geom_histogram(aes(x = completionTime), binwidth = 0.5)
 ```
 
 ```{r, fig.height=8, fig.width=8}
 # this gives for each participant the completion times. But why don't some have any???
-ggplot(dataTime) +
+ggplot(data_all) +
   geom_histogram(aes(x = completionTime), binwidth = 10) +
   facet_wrap(~ ParticipantID)
 ```
 
 ```{r}
-ggplot(dataTime) +
+ggplot(data_all) +
   geom_histogram(aes(x = completionTime), binwidth = 0.5) +
   facet_wrap(~ LocomotionTechnique)
 ```
@@ -55,7 +56,7 @@ ggplot(dataTime) +
 # 3- Analysis
 
 ```{r}
-regTime <- lmer(data = dataTime,
+regTime <- lmer(data = data_all,
              completionTime ~ LocomotionTechnique + (1 | ParticipantID))
 
 summary(regTime)

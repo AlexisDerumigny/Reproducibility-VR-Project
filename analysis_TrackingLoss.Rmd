@@ -35,18 +35,18 @@ source("preparingData.R")
 
 ```{r}
 # this gives a histogram (y is the number of times a value is present)
-ggplot(dataTrackingLoss) +
+ggplot(data_all) +
   geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5)
 ```
 
 ```{r}
-ggplot(dataTrackingLoss) +
+ggplot(data_all) +
   geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5) +
   facet_wrap(~ ParticipantID)
 ```
 
 ```{r}
-ggplot(dataTrackingLoss) +
+ggplot(data_all) +
   geom_histogram(aes(x = NrTrackerlosses), binwidth = 0.5) +
   facet_wrap(~ LocomotionTechnique)
 ```
@@ -54,7 +54,7 @@ ggplot(dataTrackingLoss) +
 # 3- Analysis
 
 ```{r}
-reg1 <- lmer(data = dataTrackingLoss,
+reg1 <- lmer(data = data_all,
              NrTrackerlosses ~ LocomotionTechnique + (1 | ParticipantID))
 
 summary(reg1)

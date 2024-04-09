@@ -55,7 +55,7 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
   
   nameQuestions = selectedQuestions$Question_description
   
-  df_selectCol = dataUXTime[, nameQuestions, drop = FALSE]
+  df_selectCol = data_all[, nameQuestions, drop = FALSE]
   for (i_Question in 1:length(nameQuestions)){
     nameOfQuestion = nameQuestions[i_Question]
     if (selectedQuestions[i_Question, "ToBeInverted"] == 0){
@@ -63,21 +63,21 @@ for (i_QuestionGroup in 1:length(allQuestionsGroups))
     }
   }
   
-  dataUXTime[, nameQuestionGroup] = rowMeans(df_selectCol)
+  data_all[, nameQuestionGroup] = rowMeans(df_selectCol)
 }
 ```
 
 
 ```{r, fig.height=12, fig.width=12}
 allQuestionsGroups = unique(data_questions$QuestionGroup)
-dataUXTime$completionTimeOp = - dataUXTime$completionTime #invert, so better = less time taken
+data_all$completionTimeOp = - data_all$completionTime #invert, so better = less time taken
 
 selectedQuestions = c(allQuestionsGroups, "completionTimeOp",
                       "I think the virtual speed felt natural compared to normal walking",
                       "I wanted to move through the virtual environment")
 
 
-dataCorMat = dataUXTime[, selectedQuestions] %>%
+dataCorMat = data_all[, selectedQuestions] %>%
   rename(
     `Natural speed` = `I think the virtual speed felt natural compared to normal walking`,
     `Desired speed` = `I wanted to move through the virtual environment`,
@@ -103,7 +103,7 @@ corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = c(0.001, 0.01, 0.05),
 
 
 ```{r, fig.height=12, fig.width=12}
-corTests = dataUXTime[, selectedQuestions] |> 
+corTests = data_all[, selectedQuestions] |> 
   corrplot::cor.mtest(use = "pairwise.complete.obs")
 
 corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = 0.05, order = "hclust",
@@ -111,8 +111,8 @@ corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = 0.05, order = "hclust
 ```
 ```{r}
 # printed this and double checked this plotting a line in raw values in Google Sheets, and it is indeed the more time taken, the better they rate the direction...
-print(dataUXTime$`Direction`)
-print(dataUXTime$completionTime)
+print(data_all$`Direction`)
+print(data_all$completionTime)
 ```
 
 
@@ -120,15 +120,15 @@ print(dataUXTime$completionTime)
 ```{r, fig.height=10, fig.width=10}
 ## These were some plots we made earlier because of an error in the data. We were trying to figure out why some values were unlogically negatively correlated, and checked if this was due to the Simpsons effect, where if and extra variable (aka participant) is not taken into account, the trend will be different. (For each participant it would go upward, while in total it would go downward). This was not the case, and in the end the weird values were caused by a wrong double inversion (therefore not inverting questions that should be inverted).
 
-ggplot(dataUXTime) +
+ggplot(data_all) +
   geom_jitter(aes(completionTime, Direction), width = 0.1, height = 0.1)
   
-dataUXTime |>
+data_all |>
   mutate(ParticipantID = factor(ParticipantID)) |>
   ggplot() +
   geom_jitter(aes(completionTime, Direction, color = ParticipantID), width = 0.1, height = 0.1)
 
-dataUXTime |>
+data_all |>
   mutate(ParticipantID = factor(ParticipantID)) |>
   ggplot() +
   geom_jitter(aes(completionTime, Direction), width = 0.01, height = 0.01) +
@@ -140,16 +140,16 @@ dataUXTime |>
 
 # 3- Modeling
 
-```{r}
-dataUXTime_pivot = dataUXTime |>
-  mutate(LocomotionTechniqueOrder = paste(LocomotionTechnique, orderCondition, sep = ""))
-
-my_model = lmer(
-  data = dataUXTime_pivot,
-  completionTimeOp ~ LocomotionTechnique * QuestionGroup + LocomotionTechniqueOrder +
-    (1 | ParticipantID) + (1 | QuestionName)
-)
-
-summary(my_model)
-```
+# ```{r}
+# dataUXTime_pivot = dataUXTime |>
+#   mutate(LocomotionTechniqueOrder = paste(LocomotionTechnique, orderCondition, sep = ""))
+# 
+# my_model = lmer(
+#   data = dataUXTime_pivot,
+#   completionTimeOp ~ LocomotionTechnique * QuestionGroup + LocomotionTechniqueOrder +
+#     (1 | ParticipantID) + (1 | QuestionName)
+# )
+# 
+# summary(my_model)
+# ```
 
