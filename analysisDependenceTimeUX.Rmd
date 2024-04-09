@@ -43,17 +43,6 @@ source("preparingData.R")
 ```
 
 
-```{r}
-dataUXTime = full_join(
-  x = dataTime |> select(! all_of("Index")),
-  y = dataUX |> mutate(ParticipantID = as.integer(ParticipantID)),
-  by = c("ParticipantID", "LocomotionTechnique"),
-  suffix = c(".x", ".y"),
-  keep = NULL
-)
-```
-
-
 # 2- Visualization
 
 ```{r}

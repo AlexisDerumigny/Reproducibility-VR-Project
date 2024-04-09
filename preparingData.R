@@ -52,7 +52,7 @@ for (i_question in 1:61){
 }
 
 # Cleaning up unused variables
-rm(i_question, offSet_questions_in_data_UX)
+rm(i_question, offSet_questions_in_data_UX, indexColumnQuestion)
 
 
 # 2. Preparing time data =======================================================
@@ -73,4 +73,24 @@ dataTrackingLoss = read.csv(file = "trackerloss_200ms.csv", header = TRUE,
 colnames(dataTrackingLoss)[
   which(colnames(dataTrackingLoss) == "SubjectNr")] = "ParticipantID"
 
+
+# 4. Merging all together ======================================================
+
+dataTimeTrackingLoss = full_join(
+  x = dataTrackingLoss |> select(! all_of("Index")),
+  y = dataTime |> select(! all_of("Index")),
+  by = c("ParticipantID", "LocomotionTechnique"),
+  suffix = c(".x", ".y"),
+  keep = NULL
+)
+
+data_all = full_join(
+  x = dataTimeTrackingLoss,
+  y = dataUX |> mutate(ParticipantID = as.integer(ParticipantID)),
+  by = c("ParticipantID", "LocomotionTechnique"),
+  suffix = c(".x", ".y"),
+  keep = NULL
+)
+
+rm(dataTime, dataTimeTrackingLoss, dataTrackingLoss, dataUX)
 
