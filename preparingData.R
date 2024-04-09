@@ -1,4 +1,4 @@
-# Loading UX data ==============================================================
+# 1a. Loading UX data ==========================================================
 
 dataUX = read.csv(file = "UXdata2023-04-28.csv", sep = ";", check.names	= FALSE)
 
@@ -17,7 +17,7 @@ dataUX <- dataUX %>%
          orderCondition = factor(orderCondition, levels = 1:4))
 
 
-# Loading data questions =======================================================
+# 1b. Loading data questions ===================================================
 
 # This is the same also for the dataset at 2023-04-28, so does not have to be changed.
 data_questions = read.csv("UXdata_questions2023-04-17.csv", sep = ";")
@@ -53,4 +53,24 @@ for (i_question in 1:61){
 
 # Cleaning up unused variables
 rm(i_question, offSet_questions_in_data_UX)
+
+
+# 2. Preparing time data =======================================================
+
+dataTime = read.csv(file = "completionTime.csv", header = TRUE,
+                    sep = ",", dec=".")
+
+colnames(dataTime)[
+  which(colnames(dataTime) == "SubjectNr")] = "ParticipantID"
+
+
+# 3, Preparing tracking loss data ==============================================
+
+
+dataTrackingLoss = read.csv(file = "trackerloss_200ms.csv", header = TRUE,
+                            sep = ";")
+
+colnames(dataTrackingLoss)[
+  which(colnames(dataTrackingLoss) == "SubjectNr")] = "ParticipantID"
+
 

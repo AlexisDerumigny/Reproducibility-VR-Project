@@ -36,7 +36,7 @@ print(attr(currentCommit, "sha"))
 # 1- Data loading and preprocessing
 
 ```{r}
-source("preparingUXdata.R")
+source("preparingData.R")
 ```
 
 
