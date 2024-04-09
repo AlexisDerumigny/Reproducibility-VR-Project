@@ -92,6 +92,10 @@ data_all = full_join(
   keep = NULL
 )
 
+# Creating the column NrTrackerlossesOp
+# => invert, so better = less tracker losses
+dataUXTrackingLoss$NrTrackerlossesOp = - dataUXTrackingLoss$NrTrackerlosses
+
 rm(dataTime, dataTimeTrackingLoss, dataTrackingLoss, dataUX)
 
 
@@ -101,9 +105,9 @@ rm(dataTime, dataTimeTrackingLoss, dataTrackingLoss, dataUX)
 # (repeat questions for each participant and each LocomotionTechnique)
 
 dataUX_pivot = pivot_longer(
-  data = data_all, cols = !all_of(c("Timestamp", "ParticipantID" , 
-                                    "LocomotionTechnique", "orderCondition",
-                                    "NrTrackerlosses", "completionTime")),
+  data = data_all, cols = !all_of(c(
+    "Timestamp", "ParticipantID" , "LocomotionTechnique", "orderCondition",
+    "NrTrackerlosses", "NrTrackerlossesOp", "completionTime")),
   names_to = "QuestionName"
 )
 
@@ -134,4 +138,31 @@ dataUX_pivot$QuestionGroup = if_else(condition = dataUX_pivot$QuestionGroup == "
                                      false = dataUX_pivot$QuestionGroup)
 
 rm(group, i_question, question, valid_questions)
+
+
+# 6. Adding averaged answers for each question group ===========================
+
+allQuestionsGroups = unique(data_questions$QuestionGroup)
+for (i_QuestionGroup in 1:length(allQuestionsGroups))
+{
+  nameQuestionGroup = allQuestionsGroups[i_QuestionGroup]
+  selectedQuestions = data_questions[
+    data_questions$QuestionGroup == nameQuestionGroup, ]
+  
+  nameQuestions = selectedQuestions$Question_description
+  
+  df_selectCol = data_all[, nameQuestions, drop = FALSE]
+  for (i_Question in 1:length(nameQuestions)){
+    nameOfQuestion = nameQuestions[i_Question]
+    if (selectedQuestions[i_Question, "ToBeInverted"] == 0){
+      df_selectCol[, nameOfQuestion] = - abs(3 - df_selectCol[, nameOfQuestion])
+    }
+  }
+  
+  data_all[, nameQuestionGroup] = rowMeans(df_selectCol)
+}
+
+rm(i_QuestionGroup, i_Question, nameQuestionGroup, df_selectCol, nameOfQuestion,
+   nameQuestions, selectedQuestions)
+
 
