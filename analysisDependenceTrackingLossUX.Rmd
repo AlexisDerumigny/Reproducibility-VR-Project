@@ -39,19 +39,7 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 
 
 ```{r}
-source("preparingTrackingLossData.R")
-source("preparingUXdata.R")
-```
-
-
-```{r}
-dataUXTrackingLoss = full_join(
-  x = dataTrackingLoss |> select(! all_of("Index")),
-  y = dataUX |> mutate(ParticipantID = as.integer(ParticipantID)),
-  by = c("ParticipantID", "LocomotionTechnique"),
-  suffix = c(".x", ".y"),
-  keep = NULL
-)
+source("preparingData.R")
 ```
 
 
