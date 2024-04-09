@@ -1,0 +1,185 @@
+---
+title: "Analysis of order effects for UX"
+date: "2023-04-17"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
+library(tidyverse)
+library(lmerTest)
+library(gt)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+
+# 1- Data loading and preprocessing
+
+```{r}
+source("preparingData.R")
+```
+
+
+# 2- Visualization
+
+```{r}
+data_all %>%
+  ggplot() +
+  geom_histogram(aes(y = `General discomfort`)) +
+  facet_grid(cols = vars(orderCondition))
+```
+```{r}
+data_all %>%
+  ggplot() +
+  geom_histogram(aes(y = `Nausea`)) +
+  facet_grid(cols = vars(orderCondition))
+```
+
+```{r}
+data_all %>%
+  mutate(ParticipantID = factor(ParticipantID),
+         orderCondition = as.numeric(orderCondition)) %>%
+  ggplot() +
+  geom_line(aes(x = orderCondition, y = Nausea)) +
+  facet_wrap(vars(ParticipantID))
+```
+
+```{r}
+data_all %>%
+  mutate(ParticipantID = factor(ParticipantID),
+         orderCondition = as.numeric(orderCondition)) %>%
+  ggplot() +
+  geom_line(aes(x = orderCondition, y = SSQ)) +
+  facet_wrap(vars(ParticipantID))
+```
+
+```{r}
+data_all %>%
+  mutate(ParticipantID = factor(ParticipantID),
+         orderCondition = as.numeric(orderCondition),
+         SSQ_noFatigue = `General discomfort`+ `Headache`+ `Eye strain`+ 
+           `Difficulty focusing`+ `Salivation increasing`+ `Sweating`+ `Nausea`+ 
+           `Difficulty concentrating`+ `Fullness of the Head`+ `Blurred vision`+ 
+           `Dizziness with eyes open`+ `Dizziness with eyes closed`+ `Vertigo`+ 
+           `Stomach awareness`+ `Burping`) %>%
+  ggplot() +
+  geom_line(aes(x = orderCondition, y = SSQ_noFatigue)) +
+  facet_wrap(vars(ParticipantID))
+```
+
+
+```{r,  fig.height = 8, fig.width = 10}
+dataUX_pivot %>%
+  group_by(orderCondition, QuestionGroup) %>%
+  summarise(averageValue = mean(value, na.rm = TRUE), .groups = "keep") %>%
+  ungroup() %>%
+  ggplot() +
+  geom_tile(aes(x = orderCondition, y = QuestionGroup, fill = averageValue)) +
+  geom_text(aes(x = orderCondition, y = QuestionGroup, label = round(averageValue, digits = 1))) +
+  guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
+  xlab("order number") + ylab("Question Group") +
+  scale_fill_gradient2(
+    limits = c(0,100), 
+    breaks = seq(0, 100, by = 10), 
+    low = "#141414", mid = "#193554", high = "#2dc6fc", midpoint = 50,
+  )
+```
+
+
+# 3. Modeling
+
+## 3.1 Model without LocomotionTechnique
+
+```{r}
+my_model = lmer(
+  data = filter(dataUX_pivot),
+  value ~ QuestionGroup * orderCondition +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+```
+
+
+```{r} 
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition )
+result = pairs(my_model_emmeans, adjust = "bonferroni")
+print(result)
+```
+
+```{r} 
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | QuestionGroup)
+result = pairs(my_model_emmeans, adjust = "bonferroni")
+print(result)
+```
+
+
+## 3.1 Model with LocomotionTechnique
+
+```{r}
+my_model = lmer(
+  data = filter(dataUX_pivot),
+  value ~ QuestionGroup * LocomotionTechnique * orderCondition +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+```
+
+```{r}
+summary(my_model)
+```
+
+
+```{r} 
+# However, the order did not influence the overall UX score comparison between conditions: within a condition there was no significant difference between a direction condition being tested as first, second, third or last (p>0.28).
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | LocomotionTechnique)
+result = pairs(my_model_emmeans, adjust = "bonferroni")
+print(result)
+```
+
+
+
+```{r}
+my_model = lmer(
+  data = filter(dataUX_pivot),
+  value ~ LocomotionTechnique * orderCondition +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+```
+
+```{r}
+my_model_coef = coef(summary(my_model))
+```
+
+
+```{r} 
+# However, the order did not influence the overall UX score comparison between conditions: within a condition there was no significant difference between a direction condition being tested as first, second, third or last (p>0.28).
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | LocomotionTechnique)
+result = pairs(my_model_emmeans, adjust = "bonferroni")
+print(result)
+```
+
+```{r} 
+my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique | orderCondition)
+result = pairs(my_model_emmeans, adjust = "bonferroni")
+print(result)
+```
+
+
+
+```{r}
+# This package needs to be installed in a special way
+# by running the next two lines:
+#
+# install.packages("remotes")
+# remotes::install_github("datalorax/equatiomatic")
+
+equatiomatic::extract_eq(my_model)
+```
+
+```{r}
+# Ratio between sample size and number of estimated coefficients
+nrow(dataUX_pivot) / (16 + 20 + 59)
+```
+
