@@ -168,41 +168,6 @@ cat(as_latex(mytable))
 ```
 
 
-# 3.4. Questions on Speed
-
-```{r}
-mymodel = lm(data = dataUX_pivot_Speed, 
-             value ~ QuestionName * LocomotionTechnique)
-
-my_model_emmeans = emmeans::emmeans(mymodel, ~ LocomotionTechnique | QuestionName)
-result = pairs(my_model_emmeans, simple = "LocomotionTechnique")
-print(result)
-
-print("Mean conditions too slow/fast compared to natural walking question")
-mean(filter(dataUX_pivot_Speed, QuestionName == "I think the virtual speed felt natural compared to normal walking")$value)
-print("Mean conditions I wanted to go slower/faster question")
-mean(filter(dataUX_pivot_Speed, QuestionName == "I wanted to move through the virtual environment")$value)
-
-
-result_df = as.data.frame(result)
-
-mytable = result_df[, c(2, 1, 3, 4, 7)] %>% # this gives the order of columns
-  group_by(QuestionName) %>%
-  gt() |>
-  fmt_scientific(
-    columns = c(estimate, SE)
-  ) |>
-  fmt_number(
-    columns = p.value, 
-    decimals = 4
-  )
-
-print(mytable)
-
-cat(as_latex(mytable))
-```
-
-
 # 4. Model the order effects
 
 # 4.1 First approach
