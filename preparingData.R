@@ -94,7 +94,7 @@ data_all = full_join(
 
 # Creating the column `NrTrackerlossesOp` and `completionTimeOp`
 # => invert, so better = less tracker losses
-dataUXTrackingLoss$NrTrackerlossesOp = - dataUXTrackingLoss$NrTrackerlosses
+data_all$NrTrackerlossesOp = - data_all$NrTrackerlosses
 # => invert, so better = less time taken
 data_all$completionTimeOp = - data_all$completionTime
 
