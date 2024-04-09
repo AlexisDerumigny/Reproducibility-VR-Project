@@ -82,12 +82,12 @@ dataUX_pivot %>%
   geom_tile(aes(x = LocomotionTechnique, y = QuestionGroup, fill = averageValue)) +
   geom_text(aes(x = LocomotionTechnique, y = QuestionGroup, label = round(averageValue, digits = 1))) +
   guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
-  xlab("Direction LocomotionTechnique") + ylab("Question Group")
-scale_fill_gradient2(
-  limits = c(0,100), 
-  breaks = seq(0, 100, by = 10), 
-  low = "#141414", mid = "#193554", high = "#2dc6fc", midpoint = 50,
-)
+  xlab("Direction LocomotionTechnique") + ylab("Question Group") +
+  scale_fill_gradient2(
+    limits = c(0,100), 
+    breaks = seq(0, 100, by = 10), 
+    low = "#141414", mid = "#193554", high = "#2dc6fc", midpoint = 50,
+  )
 
 ```
 
@@ -262,6 +262,7 @@ my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition )
 result = pairs(my_model_emmeans, adjust = "bonferroni")
 print(result)
 ```
+
 ```{r} 
 # However, the order did not influence the overall UX score comparison between conditions: within a condition there was no significant difference between a direction condition being tested as first, second, third or last (p>0.28).
 my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition | LocomotionTechnique)
