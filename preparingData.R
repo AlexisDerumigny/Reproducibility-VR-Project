@@ -92,9 +92,12 @@ data_all = full_join(
   keep = NULL
 )
 
-# Creating the column NrTrackerlossesOp
+# Creating the column `NrTrackerlossesOp` and `completionTimeOp`
 # => invert, so better = less tracker losses
 dataUXTrackingLoss$NrTrackerlossesOp = - dataUXTrackingLoss$NrTrackerlosses
+# => invert, so better = less time taken
+data_all$completionTimeOp = - data_all$completionTime
+
 
 rm(dataTime, dataTimeTrackingLoss, dataTrackingLoss, dataUX)
 
@@ -107,7 +110,8 @@ rm(dataTime, dataTimeTrackingLoss, dataTrackingLoss, dataUX)
 dataUX_pivot = pivot_longer(
   data = data_all, cols = !all_of(c(
     "Timestamp", "ParticipantID" , "LocomotionTechnique", "orderCondition",
-    "NrTrackerlosses", "NrTrackerlossesOp", "completionTime")),
+    "NrTrackerlosses", "NrTrackerlossesOp", "completionTime", "completionTimeOp"
+    )),
   names_to = "QuestionName"
 )
 

@@ -45,32 +45,9 @@ source("preparingData.R")
 
 # 2- Visualization
 
-```{r}
-allQuestionsGroups = unique(data_questions$QuestionGroup)
-for (i_QuestionGroup in 1:length(allQuestionsGroups))
-{
-  nameQuestionGroup = allQuestionsGroups[i_QuestionGroup]
-  selectedQuestions = data_questions[
-    data_questions$QuestionGroup == nameQuestionGroup, ]
-  
-  nameQuestions = selectedQuestions$Question_description
-  
-  df_selectCol = data_all[, nameQuestions, drop = FALSE]
-  for (i_Question in 1:length(nameQuestions)){
-    nameOfQuestion = nameQuestions[i_Question]
-    if (selectedQuestions[i_Question, "ToBeInverted"] == 0){
-      df_selectCol[, nameOfQuestion] = - abs(3 - df_selectCol[, nameOfQuestion])
-    }
-  }
-  
-  data_all[, nameQuestionGroup] = rowMeans(df_selectCol)
-}
-```
-
 
 ```{r, fig.height=12, fig.width=12}
 allQuestionsGroups = unique(data_questions$QuestionGroup)
-data_all$completionTimeOp = - data_all$completionTime #invert, so better = less time taken
 
 selectedQuestions = c(allQuestionsGroups, "completionTimeOp",
                       "I think the virtual speed felt natural compared to normal walking",
