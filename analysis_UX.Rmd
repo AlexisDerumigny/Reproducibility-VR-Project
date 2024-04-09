@@ -121,12 +121,12 @@ dataUX_pivot %>%
   geom_text(aes(x = LocomotionTechnique, y = QuestionGroup, label = round(averageValue, digits = 1))) +
   guides(fill=guide_legend(title="Average Values \n(higher is better)", reverse = TRUE)) +
   xlab("Direction LocomotionTechnique") + ylab("Question Group")
-  scale_fill_gradient2(
-    limits = c(0,100), 
-    breaks = seq(0, 100, by = 10), 
-    low = "#141414", mid = "#193554", high = "#2dc6fc", midpoint = 50,
-    )
-    
+scale_fill_gradient2(
+  limits = c(0,100), 
+  breaks = seq(0, 100, by = 10), 
+  low = "#141414", mid = "#193554", high = "#2dc6fc", midpoint = 50,
+)
+
 ```
 
 
@@ -163,7 +163,7 @@ UXConditionTable <- result %>%
     title = md("Pairwise comparison **UX scores locomotion techniques**"),
     subtitle = md("`Pvalues` table")
   ) %>% 
-   fmt_number(
+  fmt_number(
     columns = p.value, 
     decimals = 10
   )
@@ -289,16 +289,16 @@ model_df <- as.data.frame(coef(summary(my_model)))#[, c(1, 2, 3, 4, 5)]
 model_df <- data.frame("names"=rownames(model_df), model_df)
 VRsicknessTable <- model_df %>%
   rename(
-  `p.value` = `Pr...t..`,
-  `Std. Error` = Std..Error
+    `p.value` = `Pr...t..`,
+    `Std. Error` = Std..Error
   ) %>%
   select(`names`, Estimate, `Std. Error`, `p.value`) %>%
   gt() %>%
-    fmt_number(
+  fmt_number(
     columns = Estimate, 
     decimals = 4
   ) %>%
-    fmt_number(
+  fmt_number(
     columns = `Std. Error`, 
     decimals = 4
   ) %>%
@@ -317,7 +317,7 @@ print(VRsicknessTable)
 
 cat(as_latex(VRsicknessTable))
 
-  
+
 
 ```
 
