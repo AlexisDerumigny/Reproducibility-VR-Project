@@ -40,44 +40,6 @@ source("preparingData.R")
 ```
 
 
-
-```{r pivoting data frame}
-
-# Put in tidy format: one value per line
-# (repeat questions for each participant and each LocomotionTechnique)
-
-#dataUX$orderCondition = sample.int(4, size = 80, replace = TRUE)
-
-dataUX_pivot = pivot_longer(
-  data = dataUX, cols = !all_of(c("Timestamp", "ParticipantID" , 
-                                  "LocomotionTechnique", "orderCondition")),
-  names_to = "QuestionName"
-)
-
-dataUX_pivot$QuestionGroup = NA
-
-for (i_question in 1:61){
-  question = data_questions$Question_description[i_question]
-  group = data_questions$QuestionGroup[i_question]
-  dataUX_pivot$QuestionGroup[
-    which(dataUX_pivot$QuestionName == question) ] = group
-}
-
-# Selecting only ``valid questions''
-# the two questions on speed questions with 3 being best, 5 and 1 being worst are labeled 0 and counted as "invalid"
-valid_questions = data_questions$Question_description[which(data_questions$ToBeInverted != 0)] 
-dataUX_pivot_Speed = dataUX_pivot[which(!dataUX_pivot$QuestionName %in% valid_questions), ]
-dataUX_pivot = dataUX_pivot[which(dataUX_pivot$QuestionName %in% valid_questions), ]
-
-# Scaling the values to be between 0 and 100.
-dataUX_pivot$value = (dataUX_pivot$value - 1) * 100 / 4
-
-# Renaming SSQ to VR Sickness
-dataUX_pivot$QuestionGroup = if_else(condition = dataUX_pivot$QuestionGroup == "SSQ",
-                                     true = "VR Sickness",
-                                     false = dataUX_pivot$QuestionGroup)
-```
-
 # 2- Visualization
 
 ```{r}
