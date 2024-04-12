@@ -1,5 +1,4 @@
----
-title: "Analysis of dependence between Time and UX"
+title: "Analysis of dependence between Tracking loss and UX"
 date: "2023-04-19"
 output:
   html_document:
@@ -7,14 +6,11 @@ output:
     toc_depth: 2
 ---
 This file is for the two hypothesis:
-- The time taken impacts certain factors of the user experience.
-The time taken initially was expected to impact ...
-From the correlation matrix this was further filtered to only test this for ..., since these seemed to give the largest correlations.
+- The trackerloss impacts certain factors of the user experience.
+The trackerloss initially was expected to impact intuitiveness, perceived errors, input responsiveness, control, self motion compellingness, and the questions on speed.
+From the correlation matrix this was further filtered to only test this for Control and Self motion compellingness, since these seemed to give the largest correlations.
 
 - 
-
-
-
 
 
 To calculate this correlations, we considered taking the separate questions as random effect, similar to the UX calculation. However since there was no surety that the average of the correlations would give a result with the same meaning as the correlation of the averages, the latter option was chosen since this for sure gave the statistical test desired, although with slightly less statistical power. 
@@ -30,7 +26,7 @@ cor((x1 + x2 + x3)/3, y) = correlation between averages
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
-
+library(lmerTest)
 options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
 ```
 
@@ -45,11 +41,8 @@ source("preparingData.R")
 
 # 2- Visualization
 
-# FOR THE CORRELATION
 
 ```{r, fig.height=12, fig.width=12}
-allQuestionsGroups = unique(data_questions$QuestionGroup)
-
 selectedQuestions = c(allQuestionsGroups, "completionTimeOp", "NrTrackerlossesOp",
                       "I think the virtual speed felt natural compared to normal walking",
                       "I wanted to move through the virtual environment")
@@ -68,14 +61,13 @@ dataCorMat = data_all[, selectedQuestions]%>%
     ) %>%
    subset(select = -c(`Virtual speed`) ) 
 
+
 corMat = cor(dataCorMat, use = "pairwise.complete.obs")
 corrplot::corrplot(corMat, order = "hclust")
 ```
 
-
-
 ```{r, fig.height=12, fig.width=12}
-# corTests = dataUXTrackingLoss[, selectedQuestions] |>
+# corTests = data_all[, selectedQuestions] |>
 corTests = dataCorMat %>%
    corrplot::cor.mtest(use = "pairwise.complete.obs")
 
@@ -90,13 +82,13 @@ corTests = data_all[, selectedQuestions] |>
 corrplot::corrplot(corMat, p.mat = corTests$p, sig.level = 0.05, order = "hclust",
                    addrect = 2)
 ```
+
+
 ```{r}
 # printed this and double checked this plotting a line in raw values in Google Sheets, and it is indeed the more time taken, the better they rate the direction...
 print(data_all$`Direction`)
 print(data_all$completionTime)
 ```
-
-
 
 ```{r, fig.height=10, fig.width=10}
 ## These were some plots we made earlier because of an error in the data. We were trying to figure out why some values were unlogically negatively correlated, and checked if this was due to the Simpsons effect, where if and extra variable (aka participant) is not taken into account, the trend will be different. (For each participant it would go upward, while in total it would go downward). This was not the case, and in the end the weird values were caused by a wrong double inversion (therefore not inverting questions that should be inverted).
@@ -119,18 +111,73 @@ data_all |>
 
 
 
-# 3- Modeling
+# ----------------------------- The remainder of this document is to analyze influence of two UX factosr in more detail. This data was not further used inthe thesis ------------
 
-# ```{r}
-# dataUXTime_pivot = dataUXTime |>
-#   mutate(LocomotionTechniqueOrder = paste(LocomotionTechnique, orderCondition, sep = ""))
-# 
-# my_model = lmer(
-#   data = dataUXTime_pivot,
-#   completionTimeOp ~ LocomotionTechnique * QuestionGroup + LocomotionTechniqueOrder +
-#     (1 | ParticipantID) + (1 | QuestionName)
-# )
-# 
-# summary(my_model)
-# ```
 
+```{r, fig.height=10, fig.width=10}
+## This further analyzes the correlations in the table above individually. Fill in 2 of your choice, and get data relations between them. These were some plots we made earlier because of an error in the data. We were trying to figure out why some values were unlogically negatively correlated, and checked if this was due to the Simpsons effect, where if and extra variable (aka participant) is not taken into account, the trend will be different. (For each participant it would go upward, while in total it would go downward). This was not the case, and in the end the weird values were caused by a wrong double inversion (therefore not inverting questions that should be inverted).
+
+ggplot(data_all) +
+  geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.1, height = 0.1)
+  
+data_all |>
+  mutate(ParticipantID = factor(ParticipantID)) |>
+  ggplot() +
+  geom_jitter(aes(Satisfaction, Intuitiveness, color = ParticipantID), width = 0.1, height = 0.1)
+
+data_all |>
+  mutate(ParticipantID = factor(ParticipantID)) |>
+  ggplot() +
+  geom_jitter(aes(Satisfaction, Intuitiveness), width = 0.01, height = 0.01) +
+  facet_wrap(~ ParticipantID)
+  
+```
+
+
+
+
+
+
+# 3- Modeling individual influences on UX factors
+
+# 3.1- Influence of NrTrackerlosses on Control
+
+```{r}
+regtrackUXcor <- lmer(data = data_all,
+                      Control ~ NrTrackerlosses + 
+                        (1 | ParticipantID) + LocomotionTechnique)
+summary(regtrackUXcor)
+```
+
+
+# 3.2- Influence of NrTrackerlosses on Self-motion compellingness
+
+```{r}
+regtrackUXcor <- lmer(data = data_all,
+                      `Self-motion compellingness` ~ NrTrackerlosses + 
+                        (1 | ParticipantID) + LocomotionTechnique)
+summary(regtrackUXcor)
+```
+
+
+# 4. Getting p-values automatically and adjustement of p-values
+# do not use anything below, they are for explanation purposes
+
+```{r}
+# this would be with a regular linear model with no random effect for the participant, or fixed effect for the locomotion effect. This happens if you draw a line through all datapoints ignoring the participant. There could be a trend per participant and per locomotion technique. If taking these into account, it could be it is not correlated at all. This shows that, since this would be a significant effect, but taking account the participant and locomotion technique (above) it is not. (Do not use this outcome)
+regtrackUXcor <- lm(data = data_all,
+                      `Self-motion compellingness` ~ NrTrackerlosses)
+summary(regtrackUXcor)
+
+coef(summary(regtrackUXcor))[2, 4]
+coef(summary(regtrackUXcor))["NrTrackerlosses", "Pr(>|t|)"]
+
+# for lmer, it could be that you would use fixef() to get the fixed effects
+```
+
+
+```{r} 
+#example of how to perform multiple comparison correction with separate values. However, this is usually not done except if there are many comparisons.
+vector_of_pvalues = c(test1 = 0.05, test2 = 0.02, test3 = 0.02455)
+p.adjust(vector_of_pvalues, method = "bonferroni")
+```
