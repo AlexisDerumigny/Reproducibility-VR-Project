@@ -8,6 +8,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+#equatiomatic
 knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
 library(tidyverse)
 library(lmerTest)

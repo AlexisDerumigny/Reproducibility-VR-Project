@@ -47,15 +47,17 @@ source("preparingData.R")
 
 
 ```{r, fig.height=12, fig.width=12}
-selectedQuestions = c(allQuestionsGroups, "NrTrackerlossesOp",
+selectedQuestions = c(allQuestionsGroups, "completionTimeOp", "NrTrackerlossesOp",
                       "I think the virtual speed felt natural compared to normal walking",
                       "I wanted to move through the virtual environment")
 
-dataCorMat = data_all[, selectedQuestions] %>%
+
+dataCorMat = data_all[, selectedQuestions]%>%
   rename(
     `Natural speed` = `I think the virtual speed felt natural compared to normal walking`,
     `Desired speed` = `I wanted to move through the virtual environment`,
-    `Fewer trackinglosses` = `NrTrackerlossesOp`,
+    `Faster completion time` = `completionTimeOp`,
+    `Fewer tracking losses` = `NrTrackerlossesOp`,
     `Less VR sickness` = `SSQ`,
     `Fewer perceived errors` = `Perceived Errors`,
     `Reduced Mental Effort` = `Mental Effort`,

@@ -34,6 +34,8 @@ offSet_questions_in_data_UX = 4
 
 for (i_question in 1:61){
   indexColumnQuestion = i_question + offSet_questions_in_data_UX
+  invertedNr = data_questions$ToBeInverted[i_question]
+  
   if (data_questions$ToBeInverted[i_question] == -1){
     
     dataUX[, indexColumnQuestion] = 6 - as.numeric(dataUX[, indexColumnQuestion])
