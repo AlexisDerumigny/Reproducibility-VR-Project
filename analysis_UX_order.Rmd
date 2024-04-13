@@ -62,13 +62,13 @@ data_all %>%
 data_all %>%
   mutate(ParticipantID = factor(ParticipantID),
          orderCondition = as.numeric(orderCondition),
-         SSQ_noFatigue = `General discomfort`+ `Headache`+ `Eye strain`+ 
+         `VR sickness no Fatigue` = `General discomfort`+ `Headache`+ `Eye strain`+ 
            `Difficulty focusing`+ `Salivation increasing`+ `Sweating`+ `Nausea`+ 
            `Difficulty concentrating`+ `Fullness of the Head`+ `Blurred vision`+ 
            `Dizziness with eyes open`+ `Dizziness with eyes closed`+ `Vertigo`+ 
            `Stomach awareness`+ `Burping`) %>%
   ggplot() +
-  geom_line(aes(x = orderCondition, y = SSQ_noFatigue)) +
+  geom_line(aes(x = orderCondition, y = `VR sickness no Fatigue`)) +
   facet_wrap(vars(ParticipantID))
 ```
 

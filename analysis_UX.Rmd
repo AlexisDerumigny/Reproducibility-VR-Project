@@ -90,7 +90,11 @@ dataUX_pivot %>%
   )
 
 ```
-
+```{r}
+dataUX_pivot %>%
+group_by(QuestionGroup, LocomotionTechnique) %>%
+summarise(averageValue = mean(value, na.rm = TRUE), std = sd(value), .groups = "keep")
+```
 
 # 3- Modeling
 

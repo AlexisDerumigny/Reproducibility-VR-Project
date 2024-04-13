@@ -140,6 +140,7 @@ data_all |>
 
 # 3- Modeling individual influences on UX factors
 
+
 # 3.1- Influence of NrTrackerlosses on Control
 
 ```{r}
