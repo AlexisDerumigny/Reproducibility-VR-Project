@@ -84,4 +84,23 @@ print(trackingLossTable)
 cat(as_latex(trackingLossTable))
 ```
 
+
+# 4- Relationship with the order
+
+```{r}
+reg1 <- lmer(data = data_all,
+             NrTrackerlosses ~ orderCondition + LocomotionTechnique +
+               (1 | ParticipantID))
+
+summary(reg1)
+```
+
+
+```{r}
+my_model_emmeans = emmeans::emmeans(reg1, ~ orderCondition)
+result = pairs(my_model_emmeans, simple = "orderCondition", adjust = "bonferroni")
+print(result)
+
+result = pairs(my_model_emmeans, simple = "orderCondition", adjust = "none")
+print(result)
 ```
