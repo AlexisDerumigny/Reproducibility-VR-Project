@@ -148,8 +148,6 @@ cat(as_latex(UXConditionTable))
 my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique | QuestionGroup)
 result = pairs(my_model_emmeans, simple = "LocomotionTechnique", adjust = "bonferroni")
 print(result)
-
-
 ```
 
 
@@ -174,36 +172,8 @@ cat(as_latex(mytable))
 
 # 4. Model the order effects
 
-# 4.1 First approach
 
-```{r}
-# This compares hip as 1st experiment to hip as 4th experiment in a subject for each question group.
-# By looking up the numbers in the latin square where a condition (hip) was first and last, and noting them in the list, these can be compared below.
-grp_Hip1 = c(20, 8, 11, 18, 20)
-grp_Hip4 = c(1, 10, 16, 19)
-dataUX_pivot = dataUX_pivot %>%
-  mutate(grp_Hip = case_when(
-    ParticipantID %in% grp_Hip1 ~ 1,
-    ParticipantID %in% grp_Hip4 ~ 4
-  )) %>%
-  mutate(grp_Hip = factor(grp_Hip))
-
-reg1 = lmer(value ~ grp_Hip * QuestionGroup + (1 | ParticipantID) + (1 | QuestionName),
-            data = dataUX_pivot |> filter(LocomotionTechnique == "Hip"))
-
-summary(reg1)
-```
-
-
-```{r}
-#  comparing hip 1 and 4 per question group:
-my_model_emmeans = emmeans::emmeans(reg1, ~ grp_Hip | QuestionGroup)
-result = pairs(my_model_emmeans, simple = "grp_Hip", adjust = "bonferroni") #adjust makes no difference here. Is this done correctly?
-print(result)
-```
-
-
-# 4.2 Final approach
+## 4.1 The model
 
 ```{r}
 # all data computed in all blocks below looks for a single questionGroup filtered here (VR sickness)
@@ -247,18 +217,10 @@ VRsicknessTable <- model_df %>%
 print(VRsicknessTable)
 
 cat(as_latex(VRsicknessTable))
-
-
-
 ```
 
 
-
-
-
-
-
-
+## 4.2 Comparison of order conditions
 
 ```{r}
 #When looking over all user tests for the Question, there was a significant difference between the first and third experiment on a single subject (p=0.037) and a non-significant difference between first and fourth experiment on a single subject (p=0.0651). 
@@ -266,6 +228,9 @@ my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition )
 result = pairs(my_model_emmeans, adjust = "bonferroni")
 print(result)
 ```
+
+
+## 4.3 Comparison of order conditions per LocomotionTechnique
 
 ```{r} 
 # However, the order did not influence the overall UX score comparison between conditions: within a condition there was no significant difference between a direction condition being tested as first, second, third or last (p>0.28).
