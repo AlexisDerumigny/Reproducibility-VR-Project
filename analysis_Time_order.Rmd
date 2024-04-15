@@ -23,3 +23,33 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 source("preparingData.R")
 ```
 
+
+# 2- Visualization
+
+```{r}
+ggplot(data_all) +
+  geom_point(aes(x = orderCondition, y = completionTime))
+```
+
+
+
+
+# 3- Modeling
+
+```{r}
+my_model = lmer(
+  data = data_all,
+  completionTime ~ LocomotionTechnique + orderCondition + (1 | ParticipantID)
+)
+
+summary(my_model)
+```
+
+
+```{r}
+my_model_emmeans = emmeans::emmeans(my_model, ~ orderCondition)
+result = pairs(my_model_emmeans, simple = "orderCondition", adjust = "bonferroni")
+print(result)
+```
+
+
