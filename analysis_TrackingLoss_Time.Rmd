@@ -1,0 +1,51 @@
+---
+title: "Link between number of tracking losses and completion time"
+date: "2023-04-15"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
+library(tidyverse)
+library(lme4)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+
+# 1- Data loading and preprocessing
+
+
+```{r}
+source("preparingData.R")
+```
+
+
+# 2- Visualization
+
+
+```{r}
+ggplot(data_all) +
+  geom_point(aes(y = NrTrackerlosses, x = completionTime))
+```
+
+```{r}
+ggplot(data_all) +
+  geom_point(aes(y = NrTrackerlosses, x = completionTime)) +
+  facet_wrap(~ ParticipantID)
+```
+
+
+# 3- Modeling
+
+```{r}
+reg1 <- lmer(data = data_all,
+             NrTrackerlosses ~ completionTime + (1 | ParticipantID))
+
+summary(reg1)
+```
+
