@@ -170,12 +170,12 @@ cat(as_latex(mytable))
 
 ```{r}
 my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique + QuestionGroup)
-print(test(my_model_emmeans))
+print(gt(as.data.frame(emmeans::test(my_model_emmeans))))
 ```
 
 
 ```{r fig.width=12}
-test(my_model_emmeans) |>
+emmeans::test(my_model_emmeans) |>
   as.data.frame() |>
   mutate(lower = emmean - SE, upper = emmean + SE) |>
   filter(QuestionGroup %in% c("Ease of Use", "Input Responsiveness",
