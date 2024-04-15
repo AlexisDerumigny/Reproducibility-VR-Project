@@ -90,11 +90,7 @@ dataUX_pivot %>%
   )
 
 ```
-```{r}
-dataUX_pivot %>%
-group_by(QuestionGroup, LocomotionTechnique) %>%
-summarise(averageValue = mean(value, na.rm = TRUE), std = sd(value), .groups = "keep")
-```
+
 
 # 3- Modeling
 
@@ -167,6 +163,14 @@ mytable = result_df[, c(2, 1, 3, 4, 7)] %>% # this gives the order of columns
 print(mytable)
 
 cat(as_latex(mytable))
+```
+
+
+## 3.4 Means and their standard errors for LocomotionTechnique & QuestionGroup
+
+```{r}
+my_model_emmeans = emmeans::emmeans(my_model, ~ LocomotionTechnique + QuestionGroup)
+test(my_model_emmeans)
 ```
 
 
