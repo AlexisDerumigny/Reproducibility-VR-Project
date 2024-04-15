@@ -1,0 +1,78 @@
+---
+title: "Link between UX and completion time"
+date: "2023-04-15"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
+library(tidyverse)
+library(lmerTest)
+library(gt)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+
+# 1- Data loading and preprocessing
+
+```{r}
+source("preparingData.R")
+```
+
+
+# 2- Visualization
+
+```{r}
+ggplot(dataUX_pivot) +
+  geom_point(aes(y = value, x = completionTime))
+```
+
+
+```{r, fig.width=10}
+ggplot(dataUX_pivot) +
+  geom_point(aes(y = value, x = completionTime)) +
+  facet_wrap(vars(QuestionGroup))
+```
+
+# 3- Simple computation of correlation
+
+## 3.1- Average correlation
+
+```{r}
+my_cor = cor(data_all[, allQuestionsGroups], data_all[, "completionTime"],
+             use = "pairwise.complete.obs")
+print(my_cor)
+cat("\n\nThe average correlation is:", mean(my_cor))
+```
+
+## 3.2- Correlation with the average UX value
+
+```{r}
+my_cor = cor(rowMeans(data_all[, allQuestionsGroups]), data_all[, "completionTime"],
+             use = "pairwise.complete.obs")
+
+cat("The correlation between the average UX score and the completionTime is:",
+    my_cor)
+```
+
+
+# 4- Modeling
+
+
+```{r}
+my_model = lmer(
+  data = dataUX_pivot,
+  value ~ LocomotionTechnique + QuestionGroup + orderCondition + completionTime +
+    (1 | ParticipantID) + (1 | QuestionName)
+)
+
+summary(my_model)
+```
+
+
+
