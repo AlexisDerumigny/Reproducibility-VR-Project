@@ -22,6 +22,11 @@ options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.
 
 ```{r}
 source("preparingData.R")
+
+data_all = data_all |>
+  mutate(
+    completionTimeMin = completionTime / 60,
+    NrTrackerlossesPerMin = NrTrackerlosses  / completionTimeMin)
 ```
 
 
@@ -30,7 +35,7 @@ source("preparingData.R")
 
 ```{r}
 ggplot(data_all) +
-  geom_point(aes(y = NrTrackerlosses, x = completionTime))
+  geom_point(aes(y = NrTrackerlosses, x = completionTimeMin))
 ```
 
 ```{r}
@@ -48,4 +53,13 @@ reg1 <- lmer(data = data_all,
 
 summary(reg1)
 ```
+
+
+```{r}
+reg1 <- lmer(data = data_all,
+             NrTrackerlossesPerMin ~ completionTimeMin + (1 | ParticipantID))
+
+summary(reg1)
+```
+
 
