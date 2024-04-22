@@ -45,6 +45,13 @@ ggplot(data_all) +
 ```
 
 
+```{r}
+ggplot(data_all) +
+  geom_point(aes(y = NrTrackerlossesPerMin, x = completionTimeMin)) +
+  geom_abline(slope = -0.13, intercept = 2.79)
+```
+
+
 # 3- Modeling
 
 ```{r}
@@ -56,8 +63,10 @@ summary(reg1)
 
 
 ```{r}
-reg1 <- lmer(data = data_all,
-             NrTrackerlossesPerMin ~ completionTimeMin + (1 | ParticipantID))
+reg1 <- nlme::lme(data = na.omit(data_all),
+                  NrTrackerlossesPerMin ~ completionTimeMin,
+                  random = ~ 1 | ParticipantID,
+                  weights = varConstPower(form=~completionTimeMin))
 
 summary(reg1)
 ```
