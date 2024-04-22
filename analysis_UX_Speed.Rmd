@@ -40,7 +40,71 @@ source("preparingData.R")
 ```
 
 
-# 2- Model
+# 2- Visualization
+
+
+```{r}
+ggplot(data_all) +
+  geom_jitter(
+    aes(x = orderCondition,
+        y = `I think the virtual speed felt natural compared to normal walking`),
+    width = 0.2, height = 0.15
+  )
+```
+
+```{r}
+table(data_all$`I think the virtual speed felt natural compared to normal walking`)
+```
+
+```{r}
+table(data_all$`I think the virtual speed felt natural compared to normal walking`,
+      data_all$orderCondition)
+```
+
+```{r}
+table(data_all$`I wanted to move through the virtual environment` ,
+      data_all$orderCondition)
+```
+
+
+```{r}
+ggplot(data_all) +
+  geom_line(
+    aes(x = orderCondition,
+        y = `I think the virtual speed felt natural compared to normal walking`,
+        group = ParticipantID)
+    
+  ) +
+  facet_wrap(vars(ParticipantID))
+```
+
+```{r}
+ggplot(data_all) +
+  geom_line(
+    aes(x = NrTrackerlosses,
+        y = `I think the virtual speed felt natural compared to normal walking`,
+        group = ParticipantID)
+    
+  ) +
+  facet_wrap(vars(ParticipantID))
+
+ggplot(data_all) +
+  geom_jitter(
+    aes(x = NrTrackerlosses,
+        y = `I think the virtual speed felt natural compared to normal walking`),
+    width = 0.2, height = 0.2)
+
+```
+
+```{r}
+
+reg1 = lmer( `I think the virtual speed felt natural compared to normal walking` ~ NrTrackerlosses + (1 | ParticipantID), data = data_all)
+
+summary(reg1)
+```
+
+
+# 3- Model
 
 ```{r}
 mymodel = lm(data = dataUX_pivot_Speed, 
@@ -75,7 +139,7 @@ cat(as_latex(mytable))
 ```
 
 
-# 3- Link between perceived speed and order effects
+# 4- Link between perceived speed and order effects
 
 ```{r}
 reg1 <- lmer(data = data_all,
@@ -92,7 +156,7 @@ print(result)
 ```
 
 
-# 4- Link between desired speed and order effects
+# 5- Link between desired speed and order effects
 
 ```{r}
 reg1 <- lmer(data = data_all,
