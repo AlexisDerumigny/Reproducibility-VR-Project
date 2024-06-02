@@ -6,6 +6,7 @@ This is a repository that contains the Unity environment from the VR shoes exper
 - For the virtual Unity environment in the user test that the users walked in and gathered the tracking data see [VR shoes Unity Environment Github](https://github.com/AmberElferink/LocomotionEvaluation).
 
 ## Raw User Experience data / Questionnaires
+The .csv files in this project are minimally processed to work with R. The originals can be found at:
 
 - [Raw Data Consent form + demographics + Habituation questions Google Spreadsheet](https://docs.google.com/spreadsheets/d/18L1FDxcECkfh0YWAIcpaJXAqzQvc4uHcm83MKERbGXg/edit?usp=sharing)
 - [Raw Data UX answers for each trial](https://docs.google.com/spreadsheets/d/1mwZUULM_gU6-xjh3AGX8X6qKFkpROcqetkRowhyOwM8/edit?usp=sharing)
