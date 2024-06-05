@@ -189,6 +189,35 @@ emmeans::test(my_model_emmeans) |>
 ```
 
 
+```{r fig.width=12}
+cat("Separation by spaces:\n\n")
+
+emmeans::test(my_model_emmeans) %>%
+  filter(QuestionGroup %in% c("Ease of Use", "Input Responsiveness",
+                              "Appropriateness", "VR Sickness", "Learnability")) %>%
+  (function(df) {list(emmeans = df[, c(1,2,3)] ,
+                      SE = df[, c(1,2,4)]) }) %>%
+  lapply(FUN = pivot_wider,
+         names_from = all_of("LocomotionTechnique"),
+         values_from = any_of(c("emmean", "SE"))) %>%
+   lapply(FUN = as.data.frame) %>%
+   print()
+
+cat("\nSeparation by commas:\n\n")
+
+emmeans::test(my_model_emmeans) %>%
+  filter(QuestionGroup %in% c("Ease of Use", "Input Responsiveness",
+                              "Appropriateness", "VR Sickness", "Learnability")) %>%
+  (function(df) {list(emmeans = df[, c(1,2,3)] ,
+                      SE = df[, c(1,2,4)]) }) %>%
+  lapply(FUN = pivot_wider,
+         names_from = all_of("LocomotionTechnique"),
+         values_from = any_of(c("emmean", "SE"))) %>%
+  lapply(FUN = readr::format_csv) %>%
+  lapply(FUN = cat) %>% invisible()
+```
+
+
 # 4. Model the order effects
 
 
