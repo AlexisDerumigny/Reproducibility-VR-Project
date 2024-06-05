@@ -21,5 +21,12 @@ If you want to use the questionnaire in your own experiment, you can copy the fo
 Install Rstudio and open the project.
 Our version used: R version 4.3.3 (2024-02-29 ucrt).
 
-Install packages:
-- 
+### Install packages:
+In the R console, run the following command to install all packages: 
+
+`install.packages(c("knitr", "pbkrtest", "lmerTest", "knitr","tidyverse","lme4","emmeans","ggplot2","gt"))`
+
+
+
+## Troubleshooting: Package issues
+The command at install packages should install all required packages. In case of issues, the file package versions.txt contains the package versions used at the time of writing.
