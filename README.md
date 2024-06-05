@@ -24,8 +24,7 @@ Our version used: R version 4.3.3 (2024-02-29 ucrt).
 ### Install packages:
 In the R console, run the following command to install all packages: 
 
-`install.packages(c("knitr", "pbkrtest", "lmerTest", "knitr","tidyverse","lme4","emmeans","ggplot2","gt"))`
-
+`install.packages(c("knitr", "pbkrtest", "lmerTest", "tidyverse", "emmeans", "gt"))`
 
 
 ## Troubleshooting: Package issues
