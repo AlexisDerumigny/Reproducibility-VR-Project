@@ -6,10 +6,17 @@ This is a repository that contains the statistical analysis in R from the VR sho
 - For the virtual Unity environment in the user test that the users walked in and gathered the tracking data see [VR shoes Unity Environment Github](https://github.com/AmberElferink/LocomotionEvaluation).
 
 ## Raw User Experience data / Questionnaires
-The .csv files in this project are minimally processed to work with R. The originals can be found at:
 
 - [Raw Data Consent form + demographics + Habituation questions Google Spreadsheet](https://docs.google.com/spreadsheets/d/18L1FDxcECkfh0YWAIcpaJXAqzQvc4uHcm83MKERbGXg/edit?usp=sharing)
 - [Raw Data UX answers for each trial](https://docs.google.com/spreadsheets/d/1mwZUULM_gU6-xjh3AGX8X6qKFkpROcqetkRowhyOwM8/edit?usp=sharing)
+- [Raw SSQ scores and calculation](https://docs.google.com/spreadsheets/d/1Z6ZEOBB_HKG5OKnwlWWeoUAu6VnMPOgTiw3vIsVPwAk/edit?usp=sharing)
+- [Google Sheets algorithm design iterations with Pilot data](https://docs.google.com/spreadsheets/d/19XF_UmUEpfjw7bddJwMBGtok1HHl3Nf5debJBxfp_nA/edit?usp=sharing)
+- [Google Sheets walking at roomscale with shoes off](https://docs.google.com/spreadsheets/d/1Oq6b4OM6j8d3eRfq8EBd69d8p69u7yo5oLUwFRbnjVI/edit?usp=sharing)
+
+
+If you want to use the questionnaire in your own experiment, you can copy the form for your own use with the following links:
+- [Consent form + demographics + Habituation Google Form ](https://docs.google.com/forms/d/16HUnzGaGV9iMNdykEuPBm8y9UqQQHBMW23HlNOklhPY/copy)
+- [UX questions for each trial Google Form](https://docs.google.com/forms/d/1SUaqCdrhtiCeiOQPW767yPz0z7UIzTfgg31t2_o47Wo/copy)
 
 
 If you want to use the questionnaire in your own experiment, you can copy the form for your own use with the following links:
