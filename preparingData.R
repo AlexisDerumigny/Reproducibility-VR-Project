@@ -75,19 +75,35 @@ dataTrackingLoss = read.csv(file = "trackerloss_200ms.csv", header = TRUE,
 colnames(dataTrackingLoss)[
   which(colnames(dataTrackingLoss) == "SubjectNr")] = "ParticipantID"
 
+# 4, Preparing speed average data ==============================================
+dataAverageSpeeds = read.csv(file = "avg_speed_analysis.csv", header = TRUE,
+                            sep = ",")
+
+colnames(dataAverageSpeeds)[
+  which(colnames(dataAverageSpeeds) == "SubjectNr")] = "ParticipantID"
 
 # 4. Merging all together ======================================================
 
-dataTimeTrackingLoss = full_join(
-  x = dataTrackingLoss |> select(! all_of("Index")),
-  y = dataTime |> select(! all_of("Index")),
+dataTimeTrackingLoss = dplyr::full_join(
+  x = dataTrackingLoss |> dplyr::select(! all_of("Index")),
+  y = dataTime |> dplyr::select(! all_of("Index")),
   by = c("ParticipantID", "LocomotionTechnique"),
   suffix = c(".x", ".y"),
   keep = NULL
 )
 
-data_all = full_join(
+
+dataTimeTrackingLossSpeeds = dplyr::full_join(
   x = dataTimeTrackingLoss,
+  y = dataAverageSpeeds |> dplyr::mutate(ParticipantID = as.integer(ParticipantID)),
+  by = c("ParticipantID", "LocomotionTechnique"),
+  suffix = c(".x", ".y"),
+  keep = NULL
+)
+
+
+data_all = dplyr::full_join(
+  x = dataTimeTrackingLossSpeeds,
   y = dataUX |> mutate(ParticipantID = as.integer(ParticipantID)),
   by = c("ParticipantID", "LocomotionTechnique"),
   suffix = c(".x", ".y"),
@@ -112,7 +128,7 @@ rm(dataTime, dataTimeTrackingLoss, dataTrackingLoss, dataUX)
 dataUX_pivot = pivot_longer(
   data = data_all, cols = !all_of(c(
     "Timestamp", "ParticipantID" , "LocomotionTechnique", "orderCondition",
-    "NrTrackerlosses", "NrTrackerlossesOp", "completionTime", "completionTimeOp"
+    "NrTrackerlosses", "NrTrackerlossesOp", "completionTime", "completionTimeOp" 
     )),
   names_to = "QuestionName"
 )

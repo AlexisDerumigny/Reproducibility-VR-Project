@@ -1,0 +1,119 @@
+---
+title: "Analysis of average locomotion speed (moving)"
+date: "2023-04-19"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+#this file gives the following conclusion: the trackerloss is not significantly different between conditions.
+
+
+# To install the necessary packages, run:
+```{r setup}
+#install.packages(c("pbkrtest", "lmerTest", "knitr","tidyverse","lme4","emmeans","ggplot2"))
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = 'svg') # set output device to svg
+library(tidyverse)
+library(lme4)
+library(gt)
+
+options(width = 150) # https://bookdown.org/yihui/rmarkdown-cookbook/text-width.html
+```
+
+
+# 1- Data loading and preprocessing
+
+
+```{r}
+source("preparingData.R")
+```
+
+
+# 2- Visualization
+
+```{r}
+# this gives a histogram (y is the number of times a value is present)
+ggplot(data_all) +
+  geom_histogram(aes(x = avgLocSpeed), binwidth = 0.008)
+```
+
+```{r, fig.height=8, fig.width=8}
+# this gives for each participant the completion times. But why don't some have any???
+ggplot(data_all) +
+  geom_histogram(aes(x = avgLocSpeed), binwidth = 0.008) +
+  facet_wrap(~ ParticipantID)
+```
+
+```{r}
+ggplot(data_all) +
+  geom_histogram(aes(x = avgLocSpeed), binwidth = 0.008) +
+  facet_wrap(~ LocomotionTechnique)
+```
+
+# 3- Analysis
+
+```{r}
+regSpeed <- lmer(data = data_all,
+             avgLocSpeed ~ LocomotionTechnique + (1 | ParticipantID))
+
+summary(regSpeed)
+
+
+# model_df <- as.data.frame(coef(summary(regTime)))#[, c(1, 2, 3, 4, 5)]
+# model_df <- data.frame("names"=rownames(model_df), model_df)
+# completionTimeTable <- model_df %>%
+#   rename(
+#   `p.value` = `Pr...t..`,
+#   `Std. Error` = Std..Error
+#   ) %>%
+#   select(`names`, Estimate, `Std. Error`, `p.value`) %>%
+#   gt() %>%
+#     fmt_number(
+#     columns = Estimate, 
+#     decimals = 4
+#   ) %>%
+#     fmt_number(
+#     columns = `Std. Error`, 
+#     decimals = 4
+#   ) %>%
+#   fmt_number(
+#     columns = `p.value`, 
+#     decimals = 4
+#   ) %>%
+#   # tail(, -2) %>%
+#   tab_header(
+#     title = md("Comparison **VR sickness**"),
+#     subtitle = md("`Pvalues` table")
+#   ) #%>% 
+# #as_latex()
+# 
+# print(completionTimeTable)
+# 
+# cat(as_latex(completionTimeTable))
+```
+
+```{r}
+regSpeed_emmeans = emmeans::emmeans(regSpeed, ~ LocomotionTechnique)
+result <- pairs(regSpeed_emmeans, adjust = "bonferroni") #adjusted, we desire to find significance, so we have to be extra careful on concluding significance. Adjusting for multiple comparisons makes it less likely we find any significant results.
+
+
+speedTable <- result %>%
+  as.data.frame() %>%
+  # mutate(`Name of difference` = `1`) %>%
+  select(`contrast`, estimate, SE, p.value) %>%
+  gt() %>%
+  # tail(, -2) %>%
+  tab_header(
+    title = md("Pairwise comparison **Average Locomotion Speed between direction conditions**"),
+    subtitle = md("`Pvalues` table")
+  ) #%>% 
+
+print(speedTable)
+
+cat(as_latex(speedTable))
+
+```
+
